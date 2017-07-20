@@ -108,6 +108,11 @@ redsnapper_samegear <- dplyr::filter(redsnapper3,MESH_SIZE=="1.63",GEAR_SIZE=="4
 redsnapper_samegear$CPUE <-redsnapper_samegear$CNTEXP/redsnapper_samegear$MIN_FISH
 write_csv(redsnapper_samegear,"Red_SnapperCPUE.csv")
 
+# which months was the red snapper collected? june-july and oct-nov
+counts<-table(redsnapper_samegear$month)
+barplot(counts)
+
+#now create one csv xyz file for QGIS
 
 
 
