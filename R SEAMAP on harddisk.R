@@ -113,6 +113,12 @@ counts<-table(redsnapper_samegear$month)
 barplot(counts)
 
 #now create one csv xyz file for QGIS
+for (yr in unique(redsnapper_samegear$year)) {
+  print(yr)
+xyzfile <- dplyr::filter(redsnapper_samegear,year==yr,month==6)
+xyzfile2 <- dplyr::select(xyzfile,DECSLAT, DECSLON, CPUE)
+write_csv(xyzfile2,paste("CPUExyzfiles/",paste(yr,"06",sep="_"), ".csv", sep=""))
+}
 
 
 
