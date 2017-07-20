@@ -20,7 +20,26 @@ fishdata <- dplyr::select(bgsrec,STATIONID,CRUISEID,GENUS_BGS,SPEC_BGS,CNTEXP)
 checkunique <- fishdata %>% distinct(CRUISEID,STATIONID)
 ## it is not, there are multiple stations per cruiseid, so need to create a TRAWLID which is a merge of STATIONID and CRUISEID
 # trawlID does not add more information than STATIONID does, so stick to STATIONID.
-location <- dplyr::select(starec,STATIONID,CRUISEID,MO_DAY_YR,DECSLAT,DECSLON,DECELAT,DECELON,HAULVALUE)
+# the following is to convert separate date columns to a string: toDate <- function(dates1) {ISOdate(year, month, day)}
+# below what we'll use: convert a data string to separate columns. First the function:
+toNumerics <- function(Date) {
+  stopifnot(inherits(Date, c("Date", "POSIXt")))
+  day <- as.numeric(strftime(Date, format = "%d"))
+  month <- as.numeric(strftime(Date, format = "%m"))
+  year <- as.numeric(strftime(Date, format = "%Y"))
+  list(year = year, month = month, day = day)
+}
+
+# now the code that uses that function:
+starec$Date <- as.POSIXct(starec$MO_DAY_YR,format='%m/%d/%Y')
+starec$Time <- sapply(strsplit(as.character(starec$MO_DAY_YR), " "), "[", 2)
+testdates<-data.frame(toNumerics(starec$Date))
+starec$year<-testdates$year
+starec$month<-testdates$month
+starec$day<-testdates$day
+
+# select the columns from starec that we find useful:
+location <- dplyr::select(starec,STATIONID,CRUISEID,MO_DAY_YR,DECSLAT,DECSLON,DECELAT,DECELON,HAULVALUE,year,month,day)
 # don't use this: location2 <- dplyr::mutate(location,TRAWLID=paste(STATIONID,CRUISEID,sep="_"))
 
 #try and join with invrec to get the right gear used. after filter on ST which is shrimp trawl, which is how mostly red snapper are collected, and know when more trawls are collected per gear.
@@ -40,5 +59,60 @@ summary(redsnapper2$HAULVALUE)
 redsnapper2 <- dplyr::filter(redsnapper2,HAULVALUE!="B")
 summary(redsnapper2$HAULVALUE)
 #this is the correct red snapper file, write ot csv and upload to googledrive
-write_csv(redsnapper2,"Red_Snapper.csv")
+
+# now complete the rows that have NA (i.e. a shrimp trawl without red snapper in the catch, name the species red snapper like rest, and the abundnace zero.)
+redsnapper2$GENUS_BGS <-"LUTJANU"
+redsnapper2$SPEC_BGS <-"CAMPEC"
+redsnapper2[is.na(redsnapper2$CNTEXP),"CNTEXP"] <-0
+
+#control shift C to make a block of text a comment
+#the following code is to test a few different 
+# things to see what combination of mesh size and gear size is used. 
+# Gear size 40 and mesh size 1.63 is prevalent over all years, we're going to 
+# test spatially in QGIS what the differecne is between choosing all gear and mesh sizes 
+# theme(output in the monitoring advice analysis: what gaps do using differetn gears create?)'
+
+unique(redsnapper2$GEAR_SIZE)
+summary(redsnapper2$GEAR_SIZE)
+counts<-table(redsnapper2$GEAR_SIZE)
+barplot(counts)
+
+summary(redsnapper2$MESH_SIZE)
+counts<-table(redsnapper2$MESH_SIZE)
+barplot(counts)
+
+#remove the lines that don't have year, mesh size of gear size completed
+redsnapper_allyears <- na.omit(subset(redsnapper2,select=c(year,MESH_SIZE,GEAR_SIZE)))
+plot(redsnapper2$year,redsnapper2$GEAR_SIZE)
+plot(redsnapper2$GEAR_SIZE,redsnapper2$MESH_SIZE)
+
+redsnapper_gear <-data.frame(redsnapper_allyears$MESH_SIZE,redsnapper_allyears$GEAR_SIZE)
+redsnapper_gear$interaction<-(as.character(interaction(redsnapper_gear)))
+counts<-table(redsnapper_gear$interaction)
+barplot(counts)
+
+#above datasets only have 3 valiables,
+# now run omit NA on the whole dataset so that we have have all columns 
+# in a dataset without NA's
+redsnapper3 <- na.omit(redsnapper2)
+#now code to keep only gear size 40 mesh size 1.63
+#the code can be commented out to run it all:
+
+redsnapper_samegear <- dplyr::filter(redsnapper3,MESH_SIZE=="1.63",GEAR_SIZE=="40")
+
+#we only lose 5442 observations of the 27912 by focusing on grear and meash combo of 40, 1.63
+#so we are probably in good shape sticking to gear type ST, gear size 40 and mesh size 1.63
+
+#Now calculate CPUE where one unit of effort is one minute trawled
+
+redsnapper_samegear$CPUE <-redsnapper_samegear$CNTEXP/redsnapper_samegear$MIN_FISH
+write_csv(redsnapper_samegear,"Red_SnapperCPUE.csv")
+
+# which months was the red snapper collected? june-july and oct-nov
+counts<-table(redsnapper_samegear$month)
+barplot(counts)
+
+#now create one csv xyz file for QGIS
+
+
 
