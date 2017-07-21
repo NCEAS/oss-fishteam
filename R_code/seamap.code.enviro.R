@@ -75,7 +75,7 @@ library(rgdal)
 envdata1<-filter(envdata,!DECSLAT==-9999)
 
 #set up WGS84 projection for Shapefiles
-crs.geo<-CRS("+proj=utm +zone=14 +ellps=GRS80 +datum=NAD83 +units=m +no_defs ")  #define projection
+crs.geo<-CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")  #define projection
 
 #initialize loop check
 countr<-0
