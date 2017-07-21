@@ -72,6 +72,7 @@ alternative_read=function(i,col){
   alt_data=alt_data[,col]
   return(alt_data)
 }
+#initilize the table to store all measurements
 measure<- data.frame(flag=integer(),
                      Depth=character(), 
                      Temperatur=character(),
@@ -107,7 +108,7 @@ for (i in Seq) {
     castid<-max(which(str_detect(char_lines[(begind[i]-50):(begind[i])], "CAST")))
   }
   #Adds the cast number
-  data$Cast=rep(castid,times=nrow(data))
+  data$Cast=rep(str_extract(char_lines[castsid],"[0-9]+"),times=nrow(data))
   
   #Adds header names
   names(data)=c("flag",header,"Cast")
