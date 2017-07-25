@@ -2,7 +2,9 @@
 title: "Meta-analysis frequency"
 author: "Group 3"
 date: "7/24/2017"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -13,60 +15,104 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(plotrix) #for quick s.e. calculations sometimes needed for data tidy step
 library(meta) #nice package for most meta-statistics
+library(DT)
+library(tidyverse)
+library(PRISMAstatement)
 ```
 
-Import the meta analysis table
-```{r import data}
-data <- read_csv("meta-analysis_data.csv")
-head(data)
+
+#### 1) Search terms
+Searches were done using Web of Science.
+```{r Search Terms}
+searchTerms <- read_csv("search_terms.csv")
+datatable(searchTerms)
+
 ```
 
+
+
+#### 2) Prisma graphic
 ```{r}
+prisma(found = 118,
+       found_other = 11,
+       no_dupes = 113, 
+       screened = 113, 
+       screen_exclusions = 87, 
+       full_text = 26,
+       full_text_exclusions = 14, 
+       qualitative = 12, 
+       quantitative = 0,
+       width = 800, height = 800)
 
-# make a new column
-data$DriverType <- NA
-data$DriverType[grep('trawling',data$Driver)] <- 'fishing'
-data$DriverType[grep('recreational fishing',data$Driver)] <- 'fishing'
-data$DriverType[grep('artificial reef design',data$Driver)] <- 'reef'
-data$DriverType[grep('natural reef design',data$Driver)] <- 'reef'
-data$DriverType[grep('temperature',data$Driver)] <- 'oceanography'
-data$DriverType[grep('salinity',data$Driver)] <- 'oceanography'
-data$DriverType[grep('DO',data$Driver)] <- 'oceanography'
-data$DriverType[grep('depth',data$Driver)] <- 'oceanography'
-data$DriverType[grep('habitat type',data$Driver)] <- 'habitat'
-data$DriverType[grep('substrate',data$Driver)] <- 'habitat'
-data$DriverType[grep('distance from river',data$Driver)] <- 'habitat'
-data$DriverType[grep('intraspecific competition',data$Driver)] <- 'competition'
-data$DriverType[grep('season',data$Driver)] <- 'temporal'
+```
+
+
+
+
+#### 3) Reasons for paper eliminations
+```{r Table of paper exclusions}
+paperReasons <- read_csv("paper_reasons.csv")
+datatable(paperReasons)
+```
+
+Histogram of the reasons for excluding papers:
+
+```{r Plot Exclusions}
+ggplot(paperReasons, aes(Reason, Papers)) + geom_bar(stat = "identity") + coord_flip()
+
+```
+
+
+
+#### 4) Import the meta analysis table
+
+```{r import metadata}
+data <- read_csv("meta-analysis_data.csv")
+datatable(data)
+
+```
+
+
+A range of drivers were investigated:
+
+```{r plot by driver}
+
+data.simple <- data %>% group_by(Driver) %>% count()
+ggplot(na.omit(data.simple), aes(Driver, n)) + geom_bar(stat = "identity") + coord_flip()
+
+```
+
+Three main study types were represented:
+
+
+```{r plot by study type}
+
+data.simple <- data %>% group_by(StudyType) %>% count()
+ggplot(na.omit(data.simple), aes(StudyType, n)) + geom_bar(stat = "identity") + coord_flip()
+
+```
+
+Age classes and definitions varied: 
+
+```{r plot by age class}
 
 data$Age_class[grep('juvenile',data$Age_class)] <- 'Juvenile'
-
-data.simple <- data %>% group_by(DriverType) %>% count()
-
-ggplot(na.omit(data.simple), aes(DriverType, n)) + geom_bar(stat = "identity") + coord_flip()
-
-```
-```{r}
 data.simple <- data %>% group_by(Age_class) %>% count()
+
 ggplot(na.omit(data.simple), aes(Age_class, n)) + geom_bar(stat = "identity") + coord_flip()
-```
-```{r}
-data.simple <- data %>% group_by(Response_Units) %>% count()
-ggplot(na.omit(data.simple), aes(Response_Units, n)) + geom_bar(stat = "identity") + coord_flip()
+
 ```
 
 
 ```{r}
+treedata <- data %>% group_by(Driver) %>% summarise(mean.EffectSize_d = mean(EffectSize_d),
+                                                    error = std.error(EffectSize_d))
+```
 
-
-#data (read, tidy, and structure as needed)
-cushions <-read_csv("data/cushion-data.csv") #dataset that captured effect sizes directly from plant interaction studies
-data <- cushions %>% group_by(Study) %>% summarise(mean.Rii = mean(Rii), error = std.error(Rii))
-
-#assign model (typically a nice meta. function from one of several packages such as meta, metafor, or netmeta)
-m <- metagen(mean.Rii, error, studlab = Study, data = data) #fit generic meta-analysis to an object
+```{r}
+m <- metagen(mean.EffectSize_d, error, studlab = Driver, data = treedata) #fit generic meta-analysis to an object
 
 #viz (draw a standard forest plot or metaregression plot)
-forest(m) #grid-based graphics so a bit of work to resize
+forest(m,fontsize=10) #grid-based graphics so a bit of work to resize
 ```
 

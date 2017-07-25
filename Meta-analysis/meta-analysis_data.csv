@@ -1,4 +1,4 @@
-Paper_ID,Reviewer,StudyType,Age_class,Start_time,End_time,Season,Driver,Response_Units,Effect size_d
+Paper_ID,Reviewer,StudyType,Age_class,Start_time,End_time,Season,Driver,Response_Units,EffectSize_d
 18,Brad,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,CPUE,0.04
 18,Brad,Artificial Reef,Post-recruit,1998,2000,all,season,BPUE,0.1301
 18,Brad,Artificial Reef,Post-recruit,1998,2000,all,season,CPUE,0.435
