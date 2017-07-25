@@ -1,4 +1,4 @@
-setwd("~/oss/NGOMEXcastdata")
+setwd("~/oss/oss-fishteam/Data/NOAA/")
 
 library(parallel)
 
@@ -10,9 +10,17 @@ library(dplyr)
 
 ########################################################################
 
-#Make table with cast location and time information called loc_date
+#Make a function that can be repeated for each data type
 
-char_lines=readLines("ocldb1499972358.22646.CTD.csv")
+#Set the number of cores to be used (parallel processing)
+mc <- getOption("mc.cores", 20)
+
+extract_loc_date=function(data_type="CTD"){
+  
+csv_file=paste("ocldb1499972358.22646.",data_type,".csv",sep="")
+char_lines=readLines(csv_file)
+
+#Make table with cast location and time information called loc_date
 
 lat<-str_match(char_lines,"(Latitude)\\s+,,\\s+(\\d+.\\d+)")
 lon<-str_match(char_lines,"(Longitude)\\s+,,\\s+(-\\d+.\\d+)")
@@ -36,9 +44,16 @@ colnames(cast_df)<-c("cast")
 
 # Combine the cast, location and date data into one table
 loc_date<-cbind(cast_df,lat_df,lon_df,year_df,month_df,day_df)
-head(loc_date)
-########################################################################
+return(loc_date)
+}
+  
 
+########################################################################
+extract_tables=function(data_type="CTD"){
+  
+csv_file=paste("ocldb1499972358.22646.",data_type,".csv",sep="")
+char_lines=readLines(csv_file)
+  
 #Extract beginning and ending lines for each table
 
 beg=which(str_detect(char_lines, "^VARIABLES*"))
@@ -50,36 +65,30 @@ length(beg)
 
 #Extract each table and add unique id column (Meas_ID) and cast column (Cast)
 
-#Initial options to...
-
-#Set the number of cores to be used (parallel processing)
-mc <- getOption("mc.cores", 10)
-
 #Make a list to store the output temporarily (great for debugging)
-table_list_CSV=vector("list", length(beg)) 
+table_list=vector("list", length(beg)) 
 
 #Make a function to read in using data.tables() in case there is an error in fread()
 alternative_read=function(i,col_numbers=col_numbers){
-  alt_data=read.table("ocldb1499972358.22646.CTD.csv",skip=beg[i]+2,
+  alt_data=read.table(csv_file,skip=beg[i]+2,
                       nrows=end[i]-beg[i]-3,sep=',',header=FALSE)
   alt_data=alt_data[,col_numbers]
   return(alt_data)
 }
 
-i=5411
 #Record system time
 t = Sys.time()
-table_list=mclapply(1:length(beg),function(i){
+data_extract=mclapply(1:length(beg),function(i){
   
   #Figure out how many columns
-  ncol_raw_data=length(fread("ocldb1499972358.22646.CTD.csv",skip=beg[i]+2,
+  ncol_raw_data=length(fread(csv_file,skip=beg[i]+2,
                              nrows=1,sep=',',header=FALSE))
   
   #Store which ones to extract
   col_numbers=c(1,seq(2,ncol_raw_data-1,3))
   
   #Pulls out the data
-  data=tryCatch(fread("ocldb1499972358.22646.CTD.csv",skip=beg[i]+2,
+  data=tryCatch(fread(csv_file,skip=beg[i]+2,
                       nrows=end[i]-beg[i]-3,sep=',',header=FALSE,
                       select=col_numbers),error = function(e) alternative_read(i,col_numbers))
   
@@ -92,16 +101,87 @@ table_list=mclapply(1:length(beg),function(i){
   #Adds header names
   names(data)=c("Meas_ID",header,"Cast")
   
-  data
+  return(data)
 })
-Sys.time()-t #Prints out run time
+print(Sys.time()-t) #Prints out run time
 
-table_list_CSV=table_list
+return(data_extract)
+}
 
-head(table_list[[1]]) #Shows the first table in the list
-save(table_list_CSV, "./table_list_CTD.Rdata") #saves variable table_list to file
-# load("table_list.Rdata") #loads saved variable into environment
+loc_date_CTD=extract_loc_date()
+table_list_CTD=extract_tables()
 
-# detectCores()
-# 
-table_list[[sample(1:length(table_list),1)]]
+loc_date_XBT=extract_loc_date(data_type="XBT")
+table_list_XBT=extract_tables(data_type="XBT")
+
+loc_date_PFL=extract_loc_date(data_type="PFL")
+table_list_PFL=extract_tables(data_type="PFL")
+
+save(table_list_CTD, file="./table_list_CTD.Rdata") #saves variable table_list to file
+save(table_list_XBT, file="./table_list_XBT.Rdata") 
+save(table_list_PFL, file="./table_list_PFL.Rdata") 
+
+load("table_list_CTD.Rdata")
+load("table_list_XBT.Rdata")
+load("table_list_PFL.Rdata")
+
+NOAA_env_data_CTD=rbindlist(table_list_CTD,fill=TRUE)
+NOAA_env_data_XBT=rbindlist(table_list_XBT,fill=TRUE)
+NOAA_env_data_PFL=rbindlist(table_list_PFL,fill=TRUE)
+
+NOAA_env_data_CTD$Type=rep("CTD",nrow(NOAA_env_data_CTD))
+NOAA_env_data_XBT$Type=rep("XBT",nrow(NOAA_env_data_XBT))
+NOAA_env_data_PFL$Type=rep("PFL",nrow(NOAA_env_data_PFL))
+
+NOAA_env_data=rbind(NOAA_env_data_CTD,NOAA_env_data_XBT,fill=TRUE)
+NOAA_env_data=rbind(NOAA_env_data,NOAA_env_data_PFL,fill=TRUE)
+
+str(NOAA_env_data)
+head(NOAA_env_data)
+
+save(NOAA_env_data, file="NOAA_env_data.Rdata") 
+
+load("NOAA_env_data.Rdata")
+
+NOAA_env_data[,2] <- lapply(NOAA_env_data[,2], function(x) as.numeric(as.character(x)))
+NOAA_env_data[,3] <- lapply(NOAA_env_data[,3], function(x) as.numeric(as.character(x)))
+NOAA_env_data[,4] <- lapply(NOAA_env_data[,4], function(x) as.numeric(as.character(x)))
+NOAA_env_data[,5] <- lapply(NOAA_env_data[,5], function(x) as.numeric(as.character(x)))
+NOAA_env_data[,6] <- lapply(NOAA_env_data[,6], function(x) as.numeric(as.character(x)))
+NOAA_env_data[,7] <- lapply(NOAA_env_data[,7], function(x) as.numeric(as.character(x)))
+NOAA_env_data[,8] <- lapply(NOAA_env_data[,8], function(x) as.numeric(as.character(x)))
+NOAA_env_data[,9] <- lapply(NOAA_env_data[,9], function(x) as.numeric(as.character(x)))
+NOAA_env_data[,10] <- lapply(NOAA_env_data[,10], function(x) as.numeric(as.character(x)))
+
+save(NOAA_env_data, file="NOAA_env_data.Rdata") 
+
+length(unique(NOAA_env_data$Cast[which(is.na(NOAA_env_data$Depth))]))
+#2712
+
+bad_data=NOAA_env_data[which(is.na(NOAA_env_data$Temperatur)),]
+
+length(unique(bad_data$Cast[bad_data$Type=="CTD"]))
+#844
+length(unique(bad_data$Cast[bad_data$Type=="XBT"]))
+#1873
+length(unique(bad_data$Cast[bad_data$Type=="PFL"]))
+#27
+
+length(unique(NOAA_env_data$Cast[which(!is.na(NOAA_env_data$Temperatur))]))
+#71716
+
+(844+1873+27)/((844+1873+27)+71716)
+#Casts deleted: 2744
+#0.036852
+
+NOAA_env_data_clean=NOAA_env_data[which(!is.na(NOAA_env_data$Temperatur)),]
+nrow(NOAA_env_data_clean)
+
+save(NOAA_env_data_clean, file="NOAA_env_data_clean.Rdata") 
+
+write.csv(NOAA_env_data_clean,"NOAA_env_data_clean.csv")
+
+#3236993 CTD
+#15837546 PFL
+
+old.data=read.csv("F:/NOAA_env_data_CTD_XBT_PFL.csv",sep=",",header=TRUE)
