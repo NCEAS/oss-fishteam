@@ -1,0 +1,55 @@
+---
+title: "Meta-analysis frequency"
+author: "Group 3"
+date: "7/24/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r library setup, echo=FALSE}
+library(tidyverse)
+
+```
+
+Import the meta analysis table
+```{r import data}
+data <- read_csv("meta-analysis_data.csv")
+head(data)
+```
+
+```{r}
+
+# make a new column
+data$DriverType <- NA
+data$DriverType[grep('trawling',data$Driver)] <- 'fishing'
+data$DriverType[grep('recreational fishing',data$Driver)] <- 'fishing'
+data$DriverType[grep('artificial reef design',data$Driver)] <- 'reef'
+data$DriverType[grep('natural reef design',data$Driver)] <- 'reef'
+data$DriverType[grep('temperature',data$Driver)] <- 'oceanography'
+data$DriverType[grep('salinity',data$Driver)] <- 'oceanography'
+data$DriverType[grep('DO',data$Driver)] <- 'oceanography'
+data$DriverType[grep('depth',data$Driver)] <- 'oceanography'
+data$DriverType[grep('habitat type',data$Driver)] <- 'habitat'
+data$DriverType[grep('substrate',data$Driver)] <- 'habitat'
+data$DriverType[grep('distance from river',data$Driver)] <- 'habitat'
+data$DriverType[grep('intraspecific competition',data$Driver)] <- 'competition'
+data$DriverType[grep('season',data$Driver)] <- 'temporal'
+
+data$Age_class[grep('juvenile',data$Age_class)] <- 'Juvenile'
+
+data.simple <- data %>% group_by(DriverType) %>% count()
+
+ggplot(na.omit(data.simple), aes(DriverType, n)) + geom_bar(stat = "identity") + coord_flip()
+
+```
+```{r}
+data.simple <- data %>% group_by(Age_class) %>% count()
+ggplot(na.omit(data.simple), aes(Age_class, n)) + geom_bar(stat = "identity") + coord_flip()
+```
+```{r}
+data.simple <- data %>% group_by(Response_Units) %>% count()
+ggplot(na.omit(data.simple), aes(Response_Units, n)) + geom_bar(stat = "identity") + coord_flip()
+```
