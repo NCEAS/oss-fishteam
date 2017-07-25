@@ -11,7 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r library setup, echo=FALSE}
 library(tidyverse)
-
+library(plotrix) #for quick s.e. calculations sometimes needed for data tidy step
+library(meta) #nice package for most meta-statistics
 ```
 
 Import the meta analysis table
@@ -53,3 +54,19 @@ ggplot(na.omit(data.simple), aes(Age_class, n)) + geom_bar(stat = "identity") + 
 data.simple <- data %>% group_by(Response_Units) %>% count()
 ggplot(na.omit(data.simple), aes(Response_Units, n)) + geom_bar(stat = "identity") + coord_flip()
 ```
+
+
+```{r}
+
+
+#data (read, tidy, and structure as needed)
+cushions <-read_csv("data/cushion-data.csv") #dataset that captured effect sizes directly from plant interaction studies
+data <- cushions %>% group_by(Study) %>% summarise(mean.Rii = mean(Rii), error = std.error(Rii))
+
+#assign model (typically a nice meta. function from one of several packages such as meta, metafor, or netmeta)
+m <- metagen(mean.Rii, error, studlab = Study, data = data) #fit generic meta-analysis to an object
+
+#viz (draw a standard forest plot or metaregression plot)
+forest(m) #grid-based graphics so a bit of work to resize
+```
+
