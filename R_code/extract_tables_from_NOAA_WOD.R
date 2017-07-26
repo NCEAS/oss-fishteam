@@ -109,6 +109,9 @@ return(data_extract)
 }
 
 ########################################################################
+
+# Save table lists
+
 loc_date_CTD=extract_loc_date()
 table_list_CTD=extract_tables()
 
@@ -126,23 +129,32 @@ load("table_list_CTD.Rdata")
 load("table_list_XBT.Rdata")
 load("table_list_PFL.Rdata")
 
+# Combine each list of tables into one list, using fill=TRUE to add NAs to missing variables
+
 NOAA_env_data_CTD=rbindlist(table_list_CTD,fill=TRUE)
 NOAA_env_data_XBT=rbindlist(table_list_XBT,fill=TRUE)
 NOAA_env_data_PFL=rbindlist(table_list_PFL,fill=TRUE)
+
+# Assign cast type to each combined list
 
 NOAA_env_data_CTD$Type=rep("CTD",nrow(NOAA_env_data_CTD))
 NOAA_env_data_XBT$Type=rep("XBT",nrow(NOAA_env_data_XBT))
 NOAA_env_data_PFL$Type=rep("PFL",nrow(NOAA_env_data_PFL))
 
+# Combine all tables together
+
 NOAA_env_data=rbind(NOAA_env_data_CTD,NOAA_env_data_XBT,fill=TRUE)
 NOAA_env_data=rbind(NOAA_env_data,NOAA_env_data_PFL,fill=TRUE)
 
+# Checking the class of each column and saving
 str(NOAA_env_data)
 head(NOAA_env_data)
 
 save(NOAA_env_data, file="NOAA_env_data.Rdata") 
 
 load("NOAA_env_data.Rdata")
+
+# Convert each column to numeric
 
 NOAA_env_data[,2] <- lapply(NOAA_env_data[,2], function(x) as.numeric(as.character(x)))
 NOAA_env_data[,3] <- lapply(NOAA_env_data[,3], function(x) as.numeric(as.character(x)))
@@ -154,12 +166,17 @@ NOAA_env_data[,8] <- lapply(NOAA_env_data[,8], function(x) as.numeric(as.charact
 NOAA_env_data[,9] <- lapply(NOAA_env_data[,9], function(x) as.numeric(as.character(x)))
 NOAA_env_data[,10] <- lapply(NOAA_env_data[,10], function(x) as.numeric(as.character(x)))
 
+# Save file
+
 save(NOAA_env_data, file="NOAA_env_data.Rdata") 
 
+# Find "bad" casts (tables read in incorrectly, usually because there were
+# no environmental data collected)
 length(unique(NOAA_env_data$Cast[which(is.na(NOAA_env_data$Depth))]))
-#2712
 
 bad_data=NOAA_env_data[which(is.na(NOAA_env_data$Temperatur)),]
+
+# Number of bad casts in each data collection type
 
 length(unique(bad_data$Cast[bad_data$Type=="CTD"]))
 #844
@@ -168,37 +185,49 @@ length(unique(bad_data$Cast[bad_data$Type=="XBT"]))
 length(unique(bad_data$Cast[bad_data$Type=="PFL"]))
 #27
 
+# Number of "good" casts
 length(unique(NOAA_env_data$Cast[which(!is.na(NOAA_env_data$Temperatur))]))
 #71716
+
+# Calculating percentage of "bad" files
 
 (844+1873+27)/((844+1873+27)+71716)
 #Casts deleted: 2744
 #0.036852
 
+# Throwing out bad files
+
 NOAA_env_data_clean=NOAA_env_data[which(!is.na(NOAA_env_data$Temperatur)),]
 nrow(NOAA_env_data_clean)
+
+# Saving
 
 save(NOAA_env_data_clean, file="NOAA_env_data_clean.Rdata") 
 
 write.csv(NOAA_env_data_clean,"NOAA_env_data_clean.csv")
 
-#3236993 CTD
-#15837546 PFL
-
-
 NOAA_env_data_clean=read.csv("NOAA_env_data_clean.csv",sep=",",header=TRUE)
 
+# At this point, I gave the .csv file to TingTing to add her OSD casts
+
 ##########################################################################
+
+# Additional QA/QC and aggregating by cast
 
 NOAA.data=read.csv("env_loc_date_depth_all.csv")
 head(NOAA.data)
 str(NOAA.data)
 nrow(NOAA.data)
 
+# Converting columns to numeric
 b=as.numeric(as.character(NOAA.data[,6]))
 NOAA.data[,6]=b
 c=as.numeric(as.character(NOAA.data[,10]))
 NOAA.data[,10]=c
+
+# Getting rid of Temp, Sal, DO, and Chl values outside a "normal" range,
+# getting rid of any rows with temp=NA, looking at summer months (May-July),
+# and keeping only years after 1980.
 
 head(NOAA.data)
 NOAA.data$Temperatur[NOAA.data$Temperatur<0]=NA
@@ -210,8 +239,19 @@ NOAA.data.clean=NOAA.data.clean[NOAA.data.clean$month<8&NOAA.data.clean$month>4,
 nrow(NOAA.data.clean)
 NOAA.data.clean=NOAA.data.clean[NOAA.data.clean$year>=1980,]
 nrow(NOAA.data.clean)
+
+NOAA.data.clean$Oxygen[NOAA.data.clean$Oxygen<0]=NA
+NOAA.data.clean$Oxygen[NOAA.data.clean$Oxygen>16]=NA
+
+NOAA.data.clean$Chlorophyl[NOAA.data.clean$Chlorophyl<0]=NA
+NOAA.data.clean$Chlorophyl[NOAA.data.clean$Chlorophyl>100]=NA
+
+
 casts=unique(NOAA.data.clean$Cast)
 length(casts)
+
+# Aggregating over all casts
+
 final.data.frame=data.frame("cast"=casts,"temp"=rep(NA,length(casts)),
                             "sal"=rep(NA,length(casts)),"do"=rep(NA,length(casts)),
                             "chl"=rep(NA,length(casts)),"lat"=rep(NA,length(casts)),
@@ -220,27 +260,29 @@ final.data.frame=data.frame("cast"=casts,"temp"=rep(NA,length(casts)),
 head(final.data.frame)
 head(NOAA.data.clean)
 str(NOAA.data.clean)
-summary(NOAA.data.clean$Chlorophyl)
 
-NOAA.data.clean$Oxygen[NOAA.data.clean$Oxygen<0]=NA
-NOAA.data.clean$Oxygen[NOAA.data.clean$Oxygen>16]=NA
+# Grabbing water column means for lat, lon, time, temp, and sal 
 
-NOAA.data.clean$Chlorophyl[NOAA.data.clean$Chlorophyl<0]=NA
-NOAA.data.clean$Chlorophyl[NOAA.data.clean$Chlorophyl>100]=NA
-
-library(dplyr)
 cols.left=NOAA.data.clean %>% group_by(Cast) %>% dplyr::summarize(lat=mean(lat,na.rm=TRUE),lon=mean(lon,na.rm=TRUE),year=mean(year,na.rm=TRUE),month=mean(month,na.rm=TRUE),day=mean(day,na.rm=TRUE),temp=mean(Temperatur,na.rm=TRUE),sal=mean(Salinity,na.rm=TRUE))
+
+# Grabbing the oxygen at the bottom of the cast, and chl at the top of the cast
+
 cols.max=NOAA.data.clean %>% group_by(Cast) %>% top_n(1,Depth)
 cols.min=NOAA.data.clean %>% group_by(Cast) %>% top_n(-1,Depth)
 col.right=cols.max[,c(2,5,8,13,27)]
 col.chl=cols.min[,c(2,10)]
+
+# Joining it all together
+
 col.right2=left_join(col.right,col.chl,by="Cast")
 predict.data=left_join(cols.left,col.right2,by="Cast")
 head(predict.data)
 
+# Units for O2 and Chl
+
 #O2 ml l-1
 #Chl ug l-1
 
+# Save final file
+
 write.csv(predict.data,"predict_data.csv")
-getwd()
-?geom_point()
