@@ -1,56 +1,56 @@
-Paper_ID,Reviewer,StudyType,Age_class,Start_time,End_time,Season,Driver,Response_Units,EffectSize_d
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,CPUE,0.04
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,season,BPUE,0.1301
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,season,CPUE,0.435
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,substrate,BPUE,0.0438
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,BPUE,0.7339
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,CPUE,0.367
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,CPUE,0.0472
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,BPUE,0.055
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,BPUE,0.046
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,natural reef design,BPUE,0.072
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,natural reef design,CPUE,0.0388
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,abundance,0.1462
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,abundance,0.5012
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,season,biomass,0.2555
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,substrate,abundance,0.331
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,biomass,0.5001
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,biomass,0.6664
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,biomass,0.1631
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,abundance,0.2409
-18,Brad,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,biomass,0.1174
-20,Brad,Artificial Reef,Post-recruit,1995,1996,all,depth,abundance,22.3
-20,Brad,Artificial Reef,Post-recruit,1995,1996,all,DO,abundance,0.04
-20,Brad,Artificial Reef,Post-recruit,1995,1996,all,depth,abundance,38.78
-20,Brad,Artificial Reef,Post-recruit,1995,1996,all,DO,abundance,5.3
-21,Andrea,Trawling Effect,Juvenile,2004,2005,,habitat type,density,13.12
-21,Andrea,Trawling Effect,Juvenile,2004,2005,,trawling,density,13.06
-21,Andrea,Trawling Effect,Age 1,2004,2005,,habitat type,density,7.42
-21,Andrea,Trawling Effect,Age 0.5+,2004,2005,,trawling,density,13.26
-38,Kait,Trawling Effect,juvenile,1972,1984,,trawling,bycatch,0.451
-38,Kait,Trawling Effect,juvenile,1985,1996,,trawling,bycatch,0.7965
-38,Kait,Trawling Effect,juvenile,1972,1984,,trawling,bycatch,0.4511
-38,Kait,Trawling Effect,juvenile,1985,1996,,trawling,bycatch,0.8216
-56,sunil,Artificial Reef,juvenile,2007,2008,,artificial reef design,CPUE,2
-56,sunil,Artificial Reef,juvenile,2007,2008,,season,CPUE,13.12
-59,sunil,Artificial Reef,All classes,2011,2013,,artificial reef design,density,0.4117
-59,sunil,Artificial Reef,All classes,2011,2013,,depth,density,0.3402
-59,sunil,Artificial Reef,Pre-recruit,2011,2013,,depth,density,1.01
-77,Kait,Artificial Reef,Adult,2005,2007,,recreational fishing,density,0.98
-83,Kait,Trawling Effect,juvenile,2001,2003,,trawling,CPUE,0.7
-83,Kait,Trawling Effect,juvenile,2011,2011,,trawling,CPUE,0.08
-85,Kait,Multiple drivers,Age 0,2010,2011,,intraspecific competition,density,-0.7717
-86,Kait,Multiple drivers,Age 1,1988,2009,Summer,depth,CPUE,97.2
-86,Kait,Multiple drivers,Age 1,1988,2009,Summer,temperature,CPUE,7.2
-86,Kait,Multiple drivers,Age 1,1988,2009,Summer,salinity,CPUE,45.4
-86,Kait,Multiple drivers,Age 1,1988,2009,Summer,distance from river,CPUE,85.2
-86,Kait,Multiple drivers,Age 1,1988,2009,Summer,DO,CPUE,36
-86,Kait,Multiple drivers,Age 1,1988,2009,Summer,trawling,CPUE,295
-86,Kait,Multiple drivers,Age 1,1988,2009,Summer,DO,CPUE,-22.8
-86,Kait,Multiple drivers,Age 0,1988,2009,Fall,depth,CPUE,285.8
-86,Kait,Multiple drivers,Age 0,1988,2009,Fall,temperature,CPUE,447.8
-86,Kait,Multiple drivers,Age 0,1988,2009,Fall,salinity,CPUE,420.4
-86,Kait,Multiple drivers,Age 0,1988,2009,Fall,distance from river,CPUE,200
-86,Kait,Multiple drivers,Age 0,1988,2009,Fall,DO,CPUE,9.8
-86,Kait,Multiple drivers,Age 0,1988,2009,Fall,trawling,CPUE,234.8
-86,Kait,Multiple drivers,Age 0,1988,2009,Fall,DO,CPUE,-31.4
+Paper_ID,StudyType,Age_class,Start_time,End_time,Season,Driver,Response_type,Effect size_d,Sampling_method,Location,Effect_type_original,Value_original,stuff for effect size conv
+18,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,CPUE,0.04,hook and line,29 55.00N and 87 55.50W,r,0.02,
+18,Artificial Reef,Post-recruit,1998,2000,all,season,BPUE,0.12,hook and line,29 55.00N and 87 55.50W,r,0.06,
+18,Artificial Reef,Post-recruit,1998,2000,all,season,CPUE,0.435,hook and line,29 55.00N and 87 55.50W,r,0.21,
+18,Artificial Reef,Post-recruit,1998,2000,all,substrate,BPUE,0.04,hook and line,29 55.00N and 87 55.50W,r,0.02,
+18,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,BPUE,0.747,hook and line,29 55.00N and 87 55.50W,r,0.35,
+18,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,CPUE,0.367,hook and line,29 55.00N and 87 55.50W,r,0.18,
+18,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,CPUE,0.04,hook and line,29 55.00N and 87 55.50W,r,0.02,
+18,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,BPUE,0.06,hook and line,29 55.00N and 87 55.50W,r,0.03,
+18,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,BPUE,0.04,hook and line,29 55.00N and 87 55.50W,r,0.02,
+18,Artificial Reef,Post-recruit,1998,2000,all,natural reef design,BPUE,0.06,hook and line,29 55.00N and 87 55.50W,r,0.03,
+18,Artificial Reef,Post-recruit,1998,2000,all,natural reef design,CPUE,0.04,hook and line,29 55.00N and 87 55.50W,r,0.02,
+18,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,Abundance (all visibilities),0.14,visual surveys,29 55.00N and 87 55.50W,r,0.07,
+18,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,Abundance (visibilities > 4.5m),0.494,visual surveys,29 55.00N and 87 55.50W,r,0.24,
+18,Artificial Reef,Post-recruit,1998,2000,all,season,Biomass (visibilities >4.5m),0.26,visual surveys,29 55.00N and 87 55.50W,r,0.13,
+18,Artificial Reef,Post-recruit,1998,2000,all,substrate,Abundance (all visibilities),0.324,visual surveys,29 55.00N and 87 55.50W,r,0.16,
+18,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,Biomass (all visibilities),0.494,visual surveys,29 55.00N and 87 55.50W,r,0.24,
+18,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,Biomass (visibilities >4.5m),0.676,visual surveys,29 55.00N and 87 55.50W,r,0.32,
+18,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,Biomass (all visibilities),0.161,visual surveys,29 55.00N and 87 55.50W,r,0.08,
+18,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,Abundance (all visibilities),0.242,visual surveys,29 55.00N and 87 55.50W,r,0.12,
+18,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,Biomass (visibilities >4.5m),0.12,visual surveys,29 55.00N and 87 55.50W,r,0.06,
+20,Artificial Reef,Post-recruit,1995,1996,all,depth,Abundance,2.98,visual surveys,28 850.019N and 90 822.409 W,F,11.13,
+20,Artificial Reef,Post-recruit,1995,1996,all,DO,Abundance,0.2,visual surveys,28 850.019N and 90 822.409 W,F,0.02,
+20,Artificial Reef,Post-recruit,1995,1996,all,depth,Abundance,3.939,hydroacoustics,28 850.019N and 90 822.409 W,F,19.39,
+20,Artificial Reef,Post-recruit,1995,1996,all,DO,Abundance,2.3,hydroacoustics,28 850.019N and 90 822.409 W,F,2.65,
+21,Trawling Effect,Juvenile,2004,2005,,habitat type,Density,0.192,trawl surveys,"30deg N, 88 deg W",F,6.56,
+21,Trawling Effect,Juvenile,2004,2005,,trawling,Density,0.192,trawl surveys,"30deg N, 88 deg W",F,6.53,
+21,Trawling Effect,Age 1,2004,2005,,habitat type,Density,0.145,trawl surveys,"30deg N, 88 deg W",F,3.71,
+21,Trawling Effect,Age 0.5+,2004,2005,,trawling,Density,0.193,trawl surveys,"30deg N, 88 deg W",F,6.63,
+38,Trawling Effect,juvenile,1972,1984,,trawling,Bycatch Density,0.451,SEAMAP groundfish trawl,Northern GOM continental shelf,r,0.22,n = 446
+38,Trawling Effect,juvenile,1985,1996,,trawling,Bycatch Density,0.7965,SEAMAP groundfish trawl,Northern GOM continental shelf,r,0.37,n = 625
+38,Trawling Effect,juvenile,1972,1984,,trawling,Bycatch Density,0.4511,SEAMAP groundfish trawl,Northern GOM continental shelf,r,0.22,n = 350
+38,Trawling Effect,juvenile,1985,1996,,trawling,Bycatch Density,0.8216,SEAMAP groundfish trawl,Northern GOM continental shelf,r,0.38,n = 559
+56,Artificial Reef,juvenile,2007,2008,,artificial reef design,CPUE,0.242,traps,"40 km south of Pascagoula, MS",F,1,
+56,Artificial Reef,juvenile,2007,2008,,season,CPUE,0.619,traps,"40 km south of Pascagoula, MS",F,6.56,
+59,Artificial Reef,All classes,2011,2013,,artificial reef design,Density,0.403,"hook&line, traps, visual surveys","20–50 km south of Mobile Bay, AL",x^2,1.95,n=50
+59,Artificial Reef,All classes,2011,2013,,depth,Density,0.3302,"hook&line, traps, visual surveys","20–50 km south of Mobile Bay, AL",x^2,1.35,n=50
+59,Artificial Reef,Pre-recruit,2011,2013,,depth,Density,-0.408,"hook&line, traps, visual surveys","20–50 km south of Mobile Bay, AL",r,-0.2,n=50
+77,Artificial Reef,Adult,2005,2007,,recreational fishing,Density,0.98,mark-recapture,Northern Gulf shelf: LA to FL,d,0.98,
+83,Trawling Effect,juvenile,2001,2003,,trawling,CPUE,0.7,SEAMAP groundfish trawl,U.S. GOM continental shelf,r,0.33,
+83,Trawling Effect,juvenile,2011,2011,,trawling,CPUE,0.08,SEAMAP groundfish trawl,U.S. GOM continental shelf,r,0.04,
+85,Multiple drivers,Age 0,2010,2011,,intraspecific competition,Density,-0.772,visual surveys,outside of Mobile Bay,r,-0.36,n=60
+86,Multiple drivers,Age 1,1988,2009,Summer,depth,CPUE,0.204,SEAMAP groundfish trawl,Northern gulf shelf: TX to MS,F,48.6,
+86,Multiple drivers,Age 1,1988,2009,Summer,temperature,CPUE,0.055,SEAMAP groundfish trawl,Northern gulf shelf: TX to MS,F,3.6,
+86,Multiple drivers,Age 1,1988,2009,Summer,salinity,CPUE,0.139,SEAMAP groundfish trawl,Northern gulf shelf: TX to MS,F,22.7,
+86,Multiple drivers,Age 1,1988,2009,Summer,distance from river,CPUE,0.191,SEAMAP groundfish trawl,Northern gulf shelf: TX to MS,F,42.6,
+86,Multiple drivers,Age 1,1988,2009,Summer,DO,CPUE,0.124,SEAMAP groundfish trawl,Northern gulf shelf: TX to MS,F,18,
+86,Multiple drivers,Age 1,1988,2009,Summer,trawling,CPUE,0.355,SEAMAP groundfish trawl,Northern gulf shelf: TX to MS,F,147.5,
+86,Multiple drivers,Age 1,1988,2009,Summer,DO,CPUE,0.099,SEAMAP groundfish trawl,Northern gulf shelf: TX to MS,F,11.4,
+86,Multiple drivers,Age 0,1988,2009,Fall,depth,CPUE,0.35,SEAMAP groundfish trawl,Northern gulf shelf: TX to MS,F,142.9,
+86,Multiple drivers,Age 0,1988,2009,Fall,temperature,CPUE,0.438,SEAMAP groundfish trawl,Northern gulf shelf: TX to MS,F,223.9,
+86,Multiple drivers,Age 0,1988,2009,Fall,salinity,CPUE,0.424,SEAMAP groundfish trawl,Northern gulf shelf: TX to MS,F,201.2,
+86,Multiple drivers,Age 0,1988,2009,Fall,distance from river,CPUE,0.293,SEAMAP groundfish trawl,Northern gulf shelf: TX to MS,F,100,
+86,Multiple drivers,Age 0,1988,2009,Fall,DO,CPUE,0.065,SEAMAP groundfish trawl,Northern gulf shelf: TX to MS,F,4.9,
+86,Multiple drivers,Age 0,1988,2009,Fall,trawling,CPUE,0.316,SEAMAP groundfish trawl,Northern gulf shelf: TX to MS,F,117,
+86,Multiple drivers,Age 0,1988,2009,Fall,DO,CPUE,0.116,SEAMAP groundfish trawl,Northern gulf shelf: TX to MS,F,15.7,
