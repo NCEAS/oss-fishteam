@@ -108,6 +108,7 @@ print(Sys.time()-t) #Prints out run time
 return(data_extract)
 }
 
+########################################################################
 loc_date_CTD=extract_loc_date()
 table_list_CTD=extract_tables()
 
@@ -184,4 +185,62 @@ write.csv(NOAA_env_data_clean,"NOAA_env_data_clean.csv")
 #3236993 CTD
 #15837546 PFL
 
-old.data=read.csv("F:/NOAA_env_data_CTD_XBT_PFL.csv",sep=",",header=TRUE)
+
+NOAA_env_data_clean=read.csv("NOAA_env_data_clean.csv",sep=",",header=TRUE)
+
+##########################################################################
+
+NOAA.data=read.csv("env_loc_date_depth_all.csv")
+head(NOAA.data)
+str(NOAA.data)
+nrow(NOAA.data)
+
+b=as.numeric(as.character(NOAA.data[,6]))
+NOAA.data[,6]=b
+c=as.numeric(as.character(NOAA.data[,10]))
+NOAA.data[,10]=c
+
+head(NOAA.data)
+NOAA.data$Temperatur[NOAA.data$Temperatur<0]=NA
+NOAA.data$Temperatur[NOAA.data$Temperatur>40]=NA
+
+NOAA.data.clean=NOAA.data[!is.na(NOAA.data$Temperatur),]
+nrow(NOAA.data.clean)
+NOAA.data.clean=NOAA.data.clean[NOAA.data.clean$month<8&NOAA.data.clean$month>4,]
+nrow(NOAA.data.clean)
+NOAA.data.clean=NOAA.data.clean[NOAA.data.clean$year>=1980,]
+nrow(NOAA.data.clean)
+casts=unique(NOAA.data.clean$Cast)
+length(casts)
+final.data.frame=data.frame("cast"=casts,"temp"=rep(NA,length(casts)),
+                            "sal"=rep(NA,length(casts)),"do"=rep(NA,length(casts)),
+                            "chl"=rep(NA,length(casts)),"lat"=rep(NA,length(casts)),
+                            "lon"=rep(NA,length(casts)),"year"=rep(NA,length(casts)),
+                            "month"=rep(NA,length(casts)),"day"=rep(NA,length(casts)))
+head(final.data.frame)
+head(NOAA.data.clean)
+str(NOAA.data.clean)
+summary(NOAA.data.clean$Chlorophyl)
+
+NOAA.data.clean$Oxygen[NOAA.data.clean$Oxygen<0]=NA
+NOAA.data.clean$Oxygen[NOAA.data.clean$Oxygen>16]=NA
+
+NOAA.data.clean$Chlorophyl[NOAA.data.clean$Chlorophyl<0]=NA
+NOAA.data.clean$Chlorophyl[NOAA.data.clean$Chlorophyl>100]=NA
+
+library(dplyr)
+cols.left=NOAA.data.clean %>% group_by(Cast) %>% dplyr::summarize(lat=mean(lat,na.rm=TRUE),lon=mean(lon,na.rm=TRUE),year=mean(year,na.rm=TRUE),month=mean(month,na.rm=TRUE),day=mean(day,na.rm=TRUE),temp=mean(Temperatur,na.rm=TRUE),sal=mean(Salinity,na.rm=TRUE))
+cols.max=NOAA.data.clean %>% group_by(Cast) %>% top_n(1,Depth)
+cols.min=NOAA.data.clean %>% group_by(Cast) %>% top_n(-1,Depth)
+col.right=cols.max[,c(2,5,8,13,27)]
+col.chl=cols.min[,c(2,10)]
+col.right2=left_join(col.right,col.chl,by="Cast")
+predict.data=left_join(cols.left,col.right2,by="Cast")
+head(predict.data)
+
+#O2 ml l-1
+#Chl ug l-1
+
+write.csv(predict.data,"predict_data.csv")
+getwd()
+?geom_point()
