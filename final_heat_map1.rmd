@@ -1,0 +1,59 @@
+---
+title: "Heat map of Red Snapper abundence studies in the Gulf of Maxico"
+author: "sunil"
+date: "July 26, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#load libraries
+
+```{r load libraries}
+#setwd(Final_heatmap) #all codes area in Final_heatmap folder 
+library(tidyr)
+library(gstat)
+library(rgdal)
+library(raster)
+library(rgeos)
+library(ncdf4)
+library(tidyverse)
+library(broom)   
+options(stringsAsFactors = FALSE)
+#install.packages("maptools")
+```
+
+#input files
+```{r input files}
+# import shapefile
+us_boundaries<-readOGR("us-state-boundaries-census.shp")
+meta_pt_df<-read.csv("meta_grid_required.csv", sep = ",", header = TRUE)
+grid_df<-meta_pt_df[,2:5]
+grid_ploy<- apply(grid_df, 1, FUN = function(x) as(extent(x), "SpatialPolygons"))
+poly<-do.call("bind", grid_ploy)
+crs(poly) <- crs(us_boundaries)
+
+```
+#grid to polygons
+```{r}
+grid_data<-SpatialPolygonsDataFrame(poly, meta_pt_df)
+plot(grid_data, col=grid_data$number_study)
+plot(us_boundaries, add=TRUE, col="white")
+
+```
+#make a map by using ggplot
+```{r}
+grid_data_df<-tidy(grid_data, region = "id")
+grid_data_df$id <- as.numeric(grid_data_df$id)
+grid_data_df<-left_join(grid_data_df, grid_data@data, by="id")
+
+ggplot()+
+  geom_polygon(data=grid_data_df, aes(x=long, y=lat, group=group, fill=number_study)) +
+  geom_polygon(data=us_boundaries, aes(x=long, y=lat, group=group), fill="white", col="black") +
+  coord_map(xlim=c(-100, -80), ylim=c(20,35)) +
+  ggtitle("Red snapper abundance study heat map in the Gulf of Mexico")
+
+```
+
