@@ -9,13 +9,21 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r import data and load packages, include=FALSE}
+```{r echo=FALSE, include=FALSE}
+library(tidyverse)
+library(ggplot2)
+```
+
+##Import Data
+```{r import data and load packages, echo=TRUE, include=TRUE}
 setwd("~/oss/Synthesis/Seamap")
 invrec <-read.table("INVREC.txt", header=TRUE,sep=",")
 starec <-read.table("STAREC.txt", header=TRUE,sep=",")
 bgsrec <-read.table("BGSREC.txt", header=TRUE,sep=",")
-library(tidyverse)
-library(ggplot2)
+
+head(invrec)
+head(starec)
+head(bgsrec)
 ```
 
 ```{r clean and parse down tables, include=FALSE}
@@ -39,7 +47,7 @@ gear <- dplyr::select(invrec,STATIONID, GEAR_SIZE, GEAR_TYPE, MESH_SIZE, MIN_FIS
 rm(bgsrec,invrec,starec,testdates)
 ```
 
-##Import Data
+##Clean Data
 
 ####Fish Data
 ```{r Display Fish data, echo=TRUE, include=TRUE}
@@ -68,14 +76,13 @@ INV<- INVREC %>% select(CRUISEID, STATIONID, INVRECID, GEAR_TYPE, GEAR_SIZE, MES
 GLF<- GLFREC %>% select(CRUISEID, STATIONID, GLFID, SPEC_GLF, LEN_GLF, MEASCD_GLF) %>% filter(SPEC_GLF=="CAMPEC") #Remove some columns and filter for red snapper
 
 #Make Sure these are all true!
-length(unique(INV$STATIONID))==length(INV$STATIONID) #Station ID is unique after filtering in tows of INV
+#length(unique(INV$STATIONID))==length(INV$STATIONID) #Station ID is unique after filtering in tows of INV
 length_freq<- left_join(select(GLF, CRUISEID, STATIONID, LEN_GLF, MEASCD_GLF), select(INV, STATIONID, GEAR_TYPE, GEAR_SIZE, MESH_SIZE), by="STATIONID")
-length(length_freq$STATIONID)==length(GLF$STATIONID) #New size matches GLF so not repating length values. Merge successful.
+#length(length_freq$STATIONID)==length(GLF$STATIONID) #New size matches GLF so not repating length values. Merge successful.
 
 #Check freqency of each gear type
 length_freq<- length_freq %>% mutate(GEAR_MERGE=paste(GEAR_TYPE,GEAR_SIZE,MESH_SIZE, sep="_"))
 gear_freq<-table(length_freq$GEAR_MERGE)
-gear_freq
 barplot(gear_freq, xlab = "Gear", ylab = "Frequecy", main="Gear Used to Catch Red Snapper")
 ```
 
