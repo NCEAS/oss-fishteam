@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
+
 library(data.table)
 library(stringr)
 library(dplyr)
@@ -16,22 +17,27 @@ library(plyr)
 library(pryr)
 library(DT)
 library(pbmcapply)
+library(rgdal)
+library(leaflet)
+library(raster) 
+library(rgeos)
+library(mapview)
+library(RColorBrewer)
 
 ```
 
 # Raw data file example
-The data was downloaded from https://www.nodc.noaa.gov/OC5/WOD/pr_wod.html using  the WOD select tool to grab data(latitude 18.5 - 32.5, longitude -97.8 - -80.0) using all defaults (selected all variables from all data sources/years for the entire GOM). Data were downloaded in standard .csv format. We chose observed level data, and applied the most recently published XBT correction (Cheng et al. 2014).
+The data was downloaded from https://www.nodc.noaa.gov/OC5/WOD/pr_wod.html using  the WOD select tool to grab data (latitude 18.5 - 32.5, longitude -97.8 - -80.0) using all defaults (selected all variables from all data sources/years for the entire GOM). Data were downloaded in standard .csv format. We chose observed level data, and applied the most recently published XBT correction (Cheng et al. 2014).
 ```{r echo=FALSE}
-setwd("C:/Users/yiyit/Google Drive/nceas_workshop/")
-rawdata<-readLines("ocldb1499972358.22646.MRB.csv")
-rawdata[1:20]
+rawdata<-readLines("ocldb1499972358.22646.CTD.csv",n=25)
+
 ```
 And, we have four of such huge tables, each containing more than 20,000 tables.
 
 # Step 1, extract date and location information
 We want to create a table in the following format
 ```{r echo = FALSE}
-sampledata<-read.csv(file="loc_date_ctd.csv",nrows=10)
+sampledata<-read.table(file="CRUISES.txt",nrows=10, sep = ",",header = TRUE)
 datatable(sampledata)
 ```
 To do that, based on the structure of available data, we first extract the location, date and cast data using `str_match`. We want `cast`, becasue, this is the unique ID we can use later to join the environment measurements data.
@@ -62,21 +68,21 @@ colnames(hour.df)<-c("hour")
 colnames(cast.df)<-c("cast")
 
 # Combine the cast, location and date data into one table
-loc.date.cdt<-bind_cols(cast.df,lat.df,lon.df,year.df,month.df,day.df)
+loc.date.ctd<-bind_cols(cast.df,lat.df,lon.df,year.df,month.df,day.df)
 latdir<-getwd()
- write_csv(loc.date.cdt,file.path(dir,"loc_date_cdt.csv"))
+ write_csv(loc.date.ctd,file.path(dir,"loc_date_ctd.csv"))
 
 ```
 Using this process we obtain data in the following format
 ```{r echo = FALSE}
-datatable(read.csv(file="loc_date_ctd.csv",nrows=10))
+head(read.csv(file="loc_date_osd.csv",nrows=10))
 ```
 
 
 # Step 2, extract all tables with environmental measurement to read
-Insepecting the raw data table, we find the rows we need always start with `VARIABLES` and end with `END OF VARIALBE SECTION`. Thus, we use this two string and `str_detect` to find the beginning and ending row index for each table we want to read. Then, creating a loop to extract all tables with measurements. Finally, we also assign the cast ID for each table.
+Insepecting the raw data table, we find the rows we need always start with `VARIABLES` and end with `END OF VARIABLE SECTION`. Thus, we use this two string and `str_detect` to find the beginning and ending row index for each table we want to read. Then, we either used loops or tapply to extract all tables with measurements. Finally, we also assign the cast ID for each table.
 
-We have some code to extract tables from CTD, XBT, and PFL casts:
+We extracted tables from CTD, XBT, and PFL casts using parallel processing.
 
 ```{r eval= FALSE, echo=FALSE}
 
@@ -205,8 +211,6 @@ For OSD specifically, we used a different process due to many rows missing envir
 ```{r eval= FALSE, echo=FALSE}
 ### For OSD specifically, we used a different process due to many rows missing environmental data.
 
-#Make table with cast location and time information called loc_date
-
 char_lines=readLines("ocldb1499972358.22646.OSD.csv")
 
 ########################################################################
@@ -239,14 +243,14 @@ Seq<-1:L
 table_list <- pbmclapply(1:1000, function(i){
     
     #Figure out how many columns
-    ncol_raw_data=length(read.table("ocldb1499972358.22646.XBT.csv",skip=beg[i]+2,
+    ncol_raw_data=length(read.table("ocldb1499972358.22646.OSD.csv",skip=beg[i]+2,
                                     nrows=end[i]-beg[i]-3,sep=',',header=FALSE))
     
     #Store which ones to extract
     col_numbers=c(1,seq(2,ncol_raw_data-1,3))
     
     #Pulls out the data
-    data<-read.table("ocldb1499972358.22646.XBT.csv",skip=beg[i]+2,
+    data<-read.table("ocldb1499972358.22646.OSD.csv",skip=beg[i]+2,
                      nrows=end[i]-beg[i]-3,sep=',',header=FALSE)
     data=data[,col_numbers]
     
@@ -275,10 +279,10 @@ write.csv(measure, "env_measures_xbt.csv") #saves variable table_list to file
 ```
 We obtain one table for each data set with all oceanographic measurement and cast ID as below
 ```{r echo=FALSE}
-datatable(read.csv(file="env_measure_all.csv",nrows=10))
+head(read.csv(file="NOAA_env_data_CTD_XBT_PFL.csv",nrows=10))
 
 ```
-Then, we combine the four tables into one big table with all oceanographic measurments from all different methods.
+Then, we combine the four tables into one big table with all oceanographic measurements from all different methods.
 
 ```{r eval= FALSE, echo=FALSE}
 ########################################################################
@@ -322,8 +326,12 @@ NOAA_env_data[,10] <- lapply(NOAA_env_data[,10], function(x) as.numeric(as.chara
 
 # Save file
 
-save(NOAA_env_data, file="NOAA_env_data.Rdata") 
+save(NOAA_env_data, file="NOAA_env_data.Rdata")
 
+```
+
+```{r eval= FALSE, echo=FALSE}
+load("NOAA_env_data.Rdata")
 # Find "bad" casts (tables read in incorrectly, usually because there were
 # no environmental data collected)
 length(unique(NOAA_env_data$Cast[which(is.na(NOAA_env_data$Depth))]))
@@ -358,6 +366,11 @@ nrow(NOAA_env_data_clean)
 
 save(NOAA_env_data_clean, file="NOAA_env_data_clean.Rdata") 
 
+```
+
+```{r eval= FALSE, echo=FALSE}
+# Code to save as .csv
+
 write.csv(NOAA_env_data_clean,"NOAA_env_data_clean.csv")
 
 NOAA_env_data_clean=read.csv("NOAA_env_data_clean.csv",sep=",",header=TRUE)
@@ -365,7 +378,7 @@ NOAA_env_data_clean=read.csv("NOAA_env_data_clean.csv",sep=",",header=TRUE)
 ```
 
 # Step 3, locate ocean depth for each cast id and merge with result from step 1
-We need oceanographic data from different depth level. For example, we need temperature and salinity from midwater level, dissolved oxygen from bottom water depth. We find the water depth for each cast ID using `get.depth` from `marmap`, and save the ocean bottom depth in the file from step 1.
+We needed oceanographic data from different depth levels. For example, we needed water column averages for temperature and salinity, and dissolved oxygen from bottom water depth. We find the water depth for each cast ID using `get.depth` from `marmap`, and save the ocean bottom depth in the file from step 1.
 ```{r eval=FALSE,echo=FALSE}
 locinfo<-read.csv("loc_date_all.csv")
 # first find the range of our data
@@ -386,20 +399,20 @@ colnames(testunique)[4]<-"Cast"
 write.csv(testunique,"loc_date_depth_all.csv")
 ```
 Then, we can obtain a table with all cast ID and bottom ocean depth.
-```{r echo = FALSE}
-datatable(read.csv(file="loc_date_depth_all.csv",nrows=10))
+```{r echo=FALSE}
+head(read.csv(file="loc_date_depth_all.csv",nrows=10))
 
 ```
 
 # Step 4, merge data from step 2 with data from step 3
 Now, we combine the location, time and bottom depth data with the environment table by cast ID using `merge` with `all = TURE`. Finally, we arrived at one big table with all information
 ```{r echo = FALSE}
-datatable(read.csv(file="env_loc_date_depth_all.csv",nrows=10))
+datatable(read.csv(file="env_summer.csv",nrows=10))
 
 ```
 
 # Step 5, data manipulation.
-We, need to assign each cast id one unique row of oceacnographic data. The temparture and salinity for each ID is from midwater, the DO for each ID from bottom water level, and the Chol for each ID from surface water.
+We needed to assign each cast id one unique row of oceanographic data, including water column averaged temperature and salinity, surface chlorophyl, and bottom water DO.
 
 ```{r echo = FALSE, eval=FALSE}
 
@@ -479,17 +492,20 @@ head(predict.data)
 write.csv(predict.data,"predict_data.csv")
 
 ```
+The final data table looked like this:
+```{r echo = FALSE}
 
-# Step 6, create interactive map
+final.data=read.csv(file="predict_data.csv",nrows=10)
+head(final.data)
+
+```
+And contained `r nrow(final.data)` casts.
+
+## Step 6, create interactive map
 Now, we create an interactive map with layers : oil spill incidents, temprature, salinity, DO, and Chol for future prediction of hot spot.
 
 
-```{r echo = FALSE, eval=FALSE}
-library(rgdal)
-library(leaflet)
-library(raster)
-library(rgeos)
-library(mapview)
+```{r echo = FALSE}
 
 ##Grab Gulf of Mexico States
 states <- readOGR("cb_2016_us_state_20m/cb_2016_us_state_20m.shp",
@@ -499,48 +515,83 @@ gom_states <- subset(states, states$STUSPS %in% c(
 ))
 #Read in the oil spill in Gulf of mexico info
 oilspill<-read.csv("GoM_oilspill.csv")
-testall<-read.csv("env_loc_date_depth_all.csv")
+datetxt <- as.Date((oilspill$open_date),format = "%m/%d/%Y")
+oilspillbydate <- data.frame(lat= oilspill$lat, 
+                             lon=oilspill$lon,
+                 maxgal=oilspill$max_ptl_release_gallons,
+                 year = as.numeric(format(datetxt, format = "%Y")),
+                 month = as.numeric(format(datetxt, format = "%m")),
+                 day = as.numeric(format(datetxt, format = "%d")))
+# #Read in the WOD ocean data and select the summer data
+# wodenv<-read.csv("predict_data.csv")
+# wodenvdt<-data.table(wodenv)
+# wodenv_summ<-wodenvdt[month==6|month==7]
+# 
+# write.csv(wodenv_summ,"env_summer.csv")
 
-temp<-data.frame(temprat=testall$Temperatur,lati=testall$lat,lont=testall$lon)
-temp<-temp[!is.na(temp$temprat),]
-
+#Read in summer data
+envsum<-read.csv("env_summer.csv")
+testchol<-envsum[!is.na(envsum$sal),]
+#Read in the CPUE data from SEAMAP
+cpuesum<-read.csv("summerCPUE_for_shapefile.csv")
+cpuesum<-cpuesum[!is.na(cpuesum$CPUE),]
 pal <- colorNumeric(
   palette = "YlOrRd",
-  domain = gom_states$ALAND
+  domain = oilspillbydate$month
 )
+
+colorcpue<-brewer.pal(7,"PuBu")
 GoM <- leaflet() %>%
   addTiles() %>% 
-  addCircles(data=oilspill,
+  addCircleMarkers(data=oilspillbydate,
               lng= ~lon,
              lat= ~lat,
-             weight= 1,
-             fillColor= ~colorQuantile("YlOrRd", max_ptl_release_gallons)(max_ptl_release_gallons),
-             radius = ~max_ptl_release_gallons* 1e-4,
-               popup = ~ as.character(max_ptl_release_gallons),
-             
+             weight= 2,
+             fillColor= ~colorQuantile("BuGn", month)(month),
+             fillOpacity = 0.5,
+             radius = 4,
+              popup = ~ paste(sep = "<br/>", 
+                              paste0("Gallons released: ",  as.character(maxgal)),
+                              paste0("year: ", as.character(year)),
+                              paste0("month: ",as.character(month))),
              group = "oil spill")%>%
-   addLayersControl(
-    overlayGroups = c("oil spill"),
+  addCircleMarkers(data=testchol[testchol$year==2000,],
+                   lng=~lon,
+                   lat=~lat,
+                   weight =1,
+                   fillColor = ~colorQuantile("YlOrRd",sal)(sal),
+                   fillOpacity = 0.5,
+                   radius=5,
+                   popup=~paste(sep = "<br/>", paste0("Salinity: ", as.character(sal)),
+                                paste0("year: ", as.character(year)),
+                                paste0("month: ",as.character(month))),
+                   group ="WOD Salinity")%>%
+  addCircleMarkers(data=cpuesum,
+              lng= ~DECSLON,
+             lat= ~DECSLAT,
+             weight= 1,
+             fillColor= ~rainbow(length(CPUE),alpha=1),
+             fillOpacity = 0.5,
+             radius = ~ CPUE* 1e1,
+               popup = ~ paste(sep = "<br/>", paste0("CPUE: ", as.character(CPUE)),
+                               paste0("year: ",as.character(year)),
+                               paste0("month: ",as.character(month))),
+             group = "CPUE")%>%
+  addLayersControl(
+    overlayGroups = c("oil spill","WOD Salinity","CPUE"),
     options = layersControlOptions(collapsed = FALSE)
   )
+  # addLegend("topright",
+  #         pal = pal,
+  #         values = ~month,
+  #         title = "Month",
+  #         #labFormat = labelFormat(suffix = " gallons"),
+  #         opacity = 1
+  #           )
 
  
 GoM            
 
-GoM_temp <- leaflet() %>%
-  addTiles() %>% 
-  addCircles(data=temp,
-              lng= ~lont,
-             lat= ~lati,
-             weight= 1,
-             radius = ~temprat* 1e-1,
-               popup = ~ as.character(temprat),
-             group = "Temprature")%>%
-   addLayersControl(
-    overlayGroups = c("Temprature"),
-    options = layersControlOptions(collapsed = FALSE)
-  )
-GoM_temp
 
   
 ```
