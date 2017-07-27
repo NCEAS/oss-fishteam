@@ -1,9 +1,16 @@
 
 ========================================================
+
+width: 1440
+height: 900
+font-family: 'Gill Sans', 'Source Sans Pro', 'Aller', 'Helvetica'
+css: ../Presentation/CopyOfoss.css
+
 ![](Slide2.png)
 
 ========================================================
 ![](Slide3.png)
+
 
 ========================================================
 ![](Slide4.png)
