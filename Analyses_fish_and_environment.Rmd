@@ -1,0 +1,67 @@
+---
+title: "analyses fish and environment"
+author: "Kim de Mutsert"
+date: "7/27/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Do environmental factors drive fish distribution?
+
+During the fish surveys where red snapper was collected, environmental variables were collected as well. Simultaneous collection of fish and environmental variable makes SEAMAP an excellent dataset to investigate which environmental variables are drivers of fish abundance and distribution. Based on the meta-analysis and available data, temperature, salinity, dissolved oxygen, and Chlorophyll a were chosen in the analyses. First: a very similar data wrangling process as just presented for red snapper CPUE. 
+
+![simpsons](simpsons-yeoal.jpg)
+
+Second: Are there significant correlations between fish abundance and environmental drivers?
+```{r correlation}
+library(mgcv)
+#install.packages("gridExtra")
+library(base)
+library(bbmle)
+library(chron)
+library(tidyverse)
+library(gridExtra)
+library(dplyr)
+library(tidyr)
+library(gstat)
+library(rgdal)
+library(raster)
+library(rgeos)
+library(scales)
+#install.packages("ggpubr")
+library(ggpubr)
+options(stringsAsFactors = FALSE)
+
+fishenvdata<-read.csv("spatial-data/fishyenvdata.csv")
+
+#sum(is.na(dataonly$CPUE))
+#ifelse(fishenvdata$month.x==6 | fishenvdata$month.x==7,fishenvdata$season<-1,fishenvdata$season<-2)
+
+for (i in fishenvdata$STATIONID){
+  ifelse(fishenvdata$month.x[i]==6 || fishenvdata$month.x[i]==7,fishenvdata$season[i]<-1,fishenvdata$season[i]<-2)
+}
+#ifelse(fishenvdata$month.x[i]==6 || fishenvdata$month.x[i]==7,fishenvdata$season[i]<-1,fishenvdata$season[i]<-2)#{}   fishenvdata$season<-1
+# } else {
+#   fishenvdata$season<-2
+# }
+
+#min(fishenvdata$season)
+
+fishenvdata[fishenvdata==-9999]<-NA
+dataonly<-dplyr::select(fishenvdata, -X.1,-STATIONID)
+dataonlycorr<-dplyr::select(dataonly,-X,-year.x,-month.x,-day.x)
+
+# sum(is.na(dataonly))
+# testdropna<-fishenvdata
+# testdropna<-drop_na(testdropna)
+# attach(fishenvdata)
+# lm1<-glm(CPUE~TEMPMID+SALMID+CHLORSURF+OXYMAX)
+
+corrfishvars<-cor(dataonlycorr,y=NULL,use="pairwise.complete.obs",method=c("pearson","kendall","spearman"))
+```
+
+
+
