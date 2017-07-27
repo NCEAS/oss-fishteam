@@ -1,0 +1,53 @@
+Meta-slides
+========================================================
+author: 
+date: 
+autosize: true
+
+```{r library setup, include=FALSE,results="hide"}
+library(tidyverse)
+library(plotrix) #for quick s.e. calculations sometimes needed for data tidy step
+library(meta) #nice package for most meta-statistics
+library(DT)
+library(tidyverse)
+library(PRISMAstatement)
+library(knitr)
+
+```
+Literature Search
+========================================================
+
+```{r Search Terms, warning=FALSE, message=FALSE, echo=FALSE}
+searchTerms <- read_csv("search_terms.csv")
+kable(searchTerms, align = 'cll')
+```
+
+Paper sorting
+========================================================
+
+```{r Table of paper exclusions, echo=FALSE, message = FALSE}
+paperReasons <- read_csv("paper_reasons.csv")
+ggplot(paperReasons, aes(Reason, Papers)) + geom_bar(stat = "identity", fill = "blue") + coord_flip() + theme_grey(base_size = 18)
+
+```
+
+Drivers studied
+========================================================
+
+```{r plot by driver, results="hide", echo=FALSE}
+data <- read_csv("meta-analysis_data.csv")
+data.simple <- data %>% group_by(Driver) %>% count()
+
+ggplot(na.omit(data.simple), aes(Driver, n)) + 
+  geom_bar(stat = "identity", fill = "blue") + 
+  coord_flip() + theme_grey(base_size = 18)
+```
+*** 
+```{r, results="hide", echo=FALSE}
+data.simple <- data %>% group_by(StudyType) %>% count()
+ggplot(na.omit(data.simple), aes(StudyType, n)) + 
+  geom_bar(stat = "identity", fill = "blue") + 
+  theme_grey(base_size = 18) + 
+  coord_flip()
+
+```

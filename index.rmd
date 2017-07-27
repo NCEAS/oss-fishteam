@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 <br></br>
 
 ### Outline
-[Introduction](https://nceas.github.io/oss-fishteam/Presentation/Introduction_slides.html)
+[Introduction](https://nceas.github.io/oss-fishteam/Presentation/Intro_slides.html)
 
 [Meta-analysis](https://nceas.github.io/oss-fishteam/Meta-analysis/Meta-analysis_frequency.html)
 
