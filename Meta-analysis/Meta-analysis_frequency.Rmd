@@ -24,20 +24,18 @@ library(PRISMAstatement)
 library(knitr)
 
 ```
+<br><br>
 
-
-#### 1) Search terms
-Searches were done using Web of Science
-
-```{r Search Terms, warning=FALSE, message=FALSE, echo=FALSE}
+#### We used Web of Science to conduct a literature search:
+```{r Search Terms, warning=FALSE, message=FALSE}
 searchTerms <- read_csv("search_terms.csv")
 kable(searchTerms, align = 'cll')
 
 ```
 
+<br><br>
 
-
-#### 2) Prisma graphic
+#### Meta-analysis workflow
 
 ```{r Prisma, fig.keep='all',warning=FALSE, message=FALSE, fig.width=5, echo=FALSE}
 prisma(found = 118,
@@ -53,9 +51,9 @@ prisma(found = 118,
 ```
 
 
+<br><br>
 
-
-#### 3) Reasons for paper eliminations
+##### Reasons for paper eliminations
 
 ```{r Table of paper exclusions, echo=FALSE, message = FALSE}
 paperReasons <- read_csv("paper_reasons.csv")
@@ -64,16 +62,12 @@ paperReasons <- read_csv("paper_reasons.csv")
 
 
 
-Histogram of the reasons for excluding papers:
-
-```{r Plot Exclusions,fig.keep='all',warning=FALSE, message=FALSE, echo=FALSE}
-ggplot(paperReasons, aes(Reason, Papers)) + geom_bar(stat = "identity") + coord_flip() + theme_grey(base_size = 18)
+```{r Plot Exclusions,fig.keep='all',warning=FALSE, message=FALSE}
+ggplot(paperReasons, aes(Reason, Papers)) + geom_bar(stat = "identity", fill="blue") + coord_flip() + theme_grey(base_size = 18)
 
 ```
 
 
-
-#### 4) Import the meta analysis table
 
 ```{r import metadata, echo=FALSE, warning=FALSE, message= FALSE}
 data <- read_csv("meta-analysis_data.csv")
@@ -81,10 +75,11 @@ data <- read_csv("meta-analysis_data.csv")
 
 ```
 
+<br><br>
 
-A range of drivers were investigated:
+#### A range of drivers were investigated:
 
-```{r plot by driver, results="hide", echo=FALSE}
+```{r plot by driver, results="hide"}
 
 data.simple <- data %>% group_by(Driver) %>% count()
 ggplot(na.omit(data.simple), aes(Driver, n)) + 
@@ -92,12 +87,12 @@ ggplot(na.omit(data.simple), aes(Driver, n)) +
   coord_flip()+ theme_grey(base_size = 18)
 
 ```
-
+<br><br>
 
 Three main study types were represented:
 
 
-```{r plot by study type,  echo = FALSE}
+```{r plot by study type}
 data.simple <- data %>% group_by(StudyType) %>% count()
 ggplot(na.omit(data.simple), aes(StudyType, n)) + 
   geom_bar(stat = "identity", fill = "blue") + 
@@ -105,10 +100,11 @@ ggplot(na.omit(data.simple), aes(StudyType, n)) +
   coord_flip()
 
 ```
+<br><br>
+<br><br>
+#### Age classes and definitions varied: 
 
-Age classes and definitions varied: 
-
-```{r plot by age class, results="hide", echo=FALSE}
+```{r plot by age class, results="hide"}
 
 data$Age_class[grep('juvenile',data$Age_class)] <- 'Juvenile'
 data.simple <- data %>% group_by(Age_class) %>% count()
@@ -119,15 +115,16 @@ ggplot(na.omit(data.simple), aes(Age_class, n)) +
   coord_flip()
 
 ```
+<br><br>
 
-#### 5) Effect sizes
+#### Effect sizes
 
 ```{r Estimate effect size by driver, results="hide", echo = FALSE}
 treedata <- data %>% group_by(Driver) %>% summarise(mean.EffectSize_d = mean(EffectSize_d),
                                                     error = std.error(EffectSize_d))
 ```
 
-```{r, Forest plot, echo = FALSE}
+```{r, Forest plot}
 m <- metagen(mean.EffectSize_d, error, studlab = Driver, data = treedata) #fit generic meta-analysis to an object
 
 #viz (draw a standard forest plot or metaregression plot)

@@ -1,17 +1,18 @@
 ---
-title: "OSS Working Group: Red Snapper in the Gulf of Mexico"
+title: "Environmental Drivers of the Distribution and Abundance of Red Snapper in the Gulf of Mexico"
+author: Fisheries Synthesis (Group 3)
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+<br></br>
 ![](test_fish.JPG)
 
 <br></br>
 
-## Outline
+### Outline
 
 [Meta-analysis](https://nceas.github.io/oss-fishteam/Meta-analysis/Meta-analysis_frequency.html)
 
