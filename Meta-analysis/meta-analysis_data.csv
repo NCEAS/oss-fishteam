@@ -1,4 +1,4 @@
-Paper_ID,StudyType,Age_class,Start_time,End_time,Season,Driver,Response_type,Effect size_d,Sampling_method,Location,Effect_type_original,Value_original,stuff for effect size conv
+Paper_ID,StudyType,Age_class,Start_time,End_time,Season,Driver,Response_type,EffectSize_d,Sampling_method,Location,Effect_type_original,Value_original,stuff for effect size conv
 18,Artificial Reef,Post-recruit,1998,2000,all,artificial reef design,CPUE,0.04,hook and line,29 55.00N and 87 55.50W,r,0.02,
 18,Artificial Reef,Post-recruit,1998,2000,all,season,BPUE,0.12,hook and line,29 55.00N and 87 55.50W,r,0.06,
 18,Artificial Reef,Post-recruit,1998,2000,all,season,CPUE,0.435,hook and line,29 55.00N and 87 55.50W,r,0.21,

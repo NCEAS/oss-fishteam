@@ -2,7 +2,11 @@
 title: 'Meta-Analysis: Red Snapper in the Gulf of Mexico'
 author: "Group 3"
 output:
-  html_document: default
+  html_document:
+    theme: yeti
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
   pdf_document: default
 ---
 
@@ -17,14 +21,17 @@ library(meta) #nice package for most meta-statistics
 library(DT)
 library(tidyverse)
 library(PRISMAstatement)
+library(knitr)
+
 ```
 
 
 #### 1) Search terms
-Searches were done using Web of Science.
-```{r Search Terms, warning=FALSE, message=FALSE, fig.width=6}
+Searches were done using Web of Science
+
+```{r Search Terms, warning=FALSE, message=FALSE, echo=FALSE}
 searchTerms <- read_csv("search_terms.csv")
-datatable(searchTerms)
+kable(searchTerms, align = 'cll')
 
 ```
 
@@ -32,7 +39,7 @@ datatable(searchTerms)
 
 #### 2) Prisma graphic
 
-```{r Prisma, fig.keep='all',warning=FALSE, message=FALSE, fig.width=5}
+```{r Prisma, fig.keep='all',warning=FALSE, message=FALSE, fig.width=5, echo=FALSE}
 prisma(found = 118,
        found_other = 11,
        no_dupes = 113, 
@@ -41,26 +48,26 @@ prisma(found = 118,
        full_text = 26,
        full_text_exclusions = 14, 
        qualitative = 12, 
-       quantitative = 0,
+       quantitative = 12,
        width = 600, height = 600)
-
 ```
 
 
 
 
 #### 3) Reasons for paper eliminations
-```{r Table of paper exclusions}
+
+```{r Table of paper exclusions, echo=FALSE, message = FALSE}
 paperReasons <- read_csv("paper_reasons.csv")
-datatable(paperReasons)
+# datatable(paperReasons)
 ```
 
 
 
 Histogram of the reasons for excluding papers:
 
-```{r Plot Exclusions,results="hide", fig.keep='all',warning=FALSE, message=FALSE}
-ggplot(paperReasons, aes(Reason, Papers)) + geom_bar(stat = "identity") + coord_flip()
+```{r Plot Exclusions,fig.keep='all',warning=FALSE, message=FALSE, echo=FALSE}
+ggplot(paperReasons, aes(Reason, Papers)) + geom_bar(stat = "identity") + coord_flip() + theme_grey(base_size = 18)
 
 ```
 
@@ -68,59 +75,63 @@ ggplot(paperReasons, aes(Reason, Papers)) + geom_bar(stat = "identity") + coord_
 
 #### 4) Import the meta analysis table
 
-```{r import metadata,  results="hide"}
+```{r import metadata, echo=FALSE, warning=FALSE, message= FALSE}
 data <- read_csv("meta-analysis_data.csv")
-datatable(data)
+# datatable(data)
 
 ```
 
 
 A range of drivers were investigated:
 
-```{r plot by driver, results="hide"}
+```{r plot by driver, results="hide", echo=FALSE}
 
 data.simple <- data %>% group_by(Driver) %>% count()
-ggplot(na.omit(data.simple), aes(Driver, n)) + geom_bar(stat = "identity") + coord_flip()
+ggplot(na.omit(data.simple), aes(Driver, n)) + 
+  geom_bar(stat = "identity", fill = "blue") + 
+  coord_flip()+ theme_grey(base_size = 18)
 
 ```
-# ```{r plot by driver, results="hide"}
-# uniqueStudy <- unique(data$Paper_ID)
-# data.simple <- data[uniqueStudy,:] %>% group_by(Driver) %>% count()
-# ggplot(na.omit(data.simple), aes(Driver, n)) + geom_bar(stat = "identity") + coord_flip()
-# 
-# ```
+
 
 Three main study types were represented:
 
 
-```{r plot by study type,  results="hide"}
+```{r plot by study type,  echo = FALSE}
 data.simple <- data %>% group_by(StudyType) %>% count()
-ggplot(na.omit(data.simple), aes(StudyType, n)) + geom_bar(stat = "identity") + coord_flip()
+ggplot(na.omit(data.simple), aes(StudyType, n)) + 
+  geom_bar(stat = "identity", fill = "blue") + 
+  theme_grey(base_size = 18) + 
+  coord_flip()
 
 ```
 
 Age classes and definitions varied: 
 
-```{r plot by age class, results="hide"}
+```{r plot by age class, results="hide", echo=FALSE}
 
 data$Age_class[grep('juvenile',data$Age_class)] <- 'Juvenile'
 data.simple <- data %>% group_by(Age_class) %>% count()
 
-ggplot(na.omit(data.simple), aes(Age_class, n)) + geom_bar(stat = "identity") + coord_flip()
+ggplot(na.omit(data.simple), aes(Age_class, n)) + 
+  geom_bar(stat = "identity", fill = "blue") + 
+  theme_grey(base_size = 18) +
+  coord_flip()
 
 ```
 
 #### 5) Effect sizes
 
-```{r Estimate effect size by driver, results="hide"}
+```{r Estimate effect size by driver, results="hide", echo = FALSE}
 treedata <- data %>% group_by(Driver) %>% summarise(mean.EffectSize_d = mean(EffectSize_d),
                                                     error = std.error(EffectSize_d))
 ```
 
-```{r, Forest plot}
+```{r, Forest plot, echo = FALSE}
 m <- metagen(mean.EffectSize_d, error, studlab = Driver, data = treedata) #fit generic meta-analysis to an object
 
 #viz (draw a standard forest plot or metaregression plot)
-forest(m,leftcols = "Driver",rightcols = c("effect", "ci"), fontsize=10) #grid-based graphics so a bit of work to resize
+forest(m,leftcols = "Driver",rightcols = c("effect", "ci"), fontsize=12) #grid-based graphics so a bit of work to resize
 ```
 
+![](./Final_heat_map.png) 
