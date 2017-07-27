@@ -1,5 +1,5 @@
 ---
-title: "Data Wrangle"
+title: "CPUE Data Wrangle"
 author: "Fish Team!"
 date: "7/26/2017"
 output: html_document
@@ -15,18 +15,20 @@ library(ggplot2)
 ```
 
 ##Import Data
-```{r import data and load packages, echo=TRUE, include=TRUE}
+```{r import data and load packages, echo=TRUE, include=TRUE, cache=TRUE}
 setwd("~/oss/Synthesis/Seamap")
 invrec <-read.table("INVREC.txt", header=TRUE,sep=",")
 starec <-read.table("STAREC.txt", header=TRUE,sep=",")
 bgsrec <-read.table("BGSREC.txt", header=TRUE,sep=",")
+glfrec<- read.table("GLFREC.txt", header=TRUE,sep=",")
 
 head(invrec)
 head(starec)
 head(bgsrec)
+head(glfrec)
 ```
 
-```{r clean and parse down tables, include=FALSE}
+```{r clean and parse down tables, include=FALSE, cache=TRUE}
 toNumerics <- function(Date) {
   stopifnot(inherits(Date, c("Date", "POSIXt")))
   day <- as.numeric(strftime(Date, format = "%d"))
@@ -45,6 +47,7 @@ starec$day<-testdates$day
 location <- dplyr::select(starec,STATIONID,DECSLAT,DECSLON,HAULVALUE,year,month,day)
 gear <- dplyr::select(invrec,STATIONID, GEAR_SIZE, GEAR_TYPE, MESH_SIZE, MIN_FISH)
 rm(bgsrec,invrec,starec,testdates)
+size<- glfrec %>% select(STATIONID, GLFID, SPEC_GLF, LEN_GLF) %>% filter(SPEC_GLF=="CAMPEC") #Remove some columns and filter for red snapper
 ```
 
 ##Clean Data
@@ -64,6 +67,11 @@ head(location)
 head(gear)
 ```
 
+####Size Data
+```{r Display SIze data, echo=TRUE, include=TRUE}
+head(size)
+```
+
 ##Select Gear Type
 
 ####Number of different gear combinations
@@ -73,12 +81,41 @@ rs_gear<- dplyr::inner_join(rs, gear, by="STATIONID")
 rs_gear<- rs_gear %>% unite("GEAR_COMBO", c("GEAR_TYPE", "GEAR_SIZE", "MESH_SIZE"))
 length(unique(rs_gear$GEAR_COMBO))
 
-barplot(rev(sort(table(rs_gear$GEAR_COMBO))))
+barplot(rev(sort(table(rs_gear$GEAR_COMBO))), xlab = "Gear", ylab = "Frequency", main = "Frequency of Gear Used to Catch Red Snapper")
 ```
 
 ```{r Select Gear Type, echo=TRUE, include=TRUE}
 gearshrimptrawl <- dplyr::filter(gear, GEAR_TYPE=="ST", GEAR_SIZE==40, MESH_SIZE==1.63) 
 head(gearshrimptrawl)
+```
+
+####Are We Catching Adults or Juveniles?
+```{r Length Frequency}
+
+length_freq<- left_join(select(size, STATIONID, LEN_GLF), select(gear, STATIONID, GEAR_TYPE, GEAR_SIZE, MESH_SIZE), by="STATIONID")
+
+#Check freqency of each gear type
+length_freq<- length_freq %>% dplyr::filter(GEAR_TYPE=="ST", GEAR_SIZE==40, MESH_SIZE==1.63, !is.na(LEN_GLF)) 
+
+Lm= 230 #Length at maturity Red Snapper
+        #Maturity obtained at year 2, but estimate for size at year 2 is greater than 230cm
+```
+
+```{r echo=FALSE, message= FALSE}
+#Frequency distribution of Red Snapper
+
+ggplot(length_freq, aes(length_freq$LEN_GLF))+
+  geom_histogram()+
+  annotate(geom="text",x=235, y=20000, label="Lm", hjust=0)+
+  geom_vline(xintercept=230)+
+  labs(x="Length (mm)", y="counts", title="Length Distribution")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+#####Percent Juveniles
+
+```{r echo=TRUE, include=TRUE}
+sum(length_freq$LEN_GLF<230)/length(length_freq$LEN_GLF)*100
 ```
 
 ##Join Gear and Location
@@ -172,8 +209,6 @@ head(location_gearST_redsnapper)
 
 ```{r echo=TRUE, include=TRUE}
 counts<-table(location_gearST_redsnapper$month)
-counts
-sum(counts)
 barplot(counts, xlab="Month", ylab = "Sampling Effort", main="Red Snapper Sampling Effort vs Month")
 ```
 
@@ -181,13 +216,18 @@ barplot(counts, xlab="Month", ylab = "Sampling Effort", main="Red Snapper Sampli
 
 ##Select Data in those windows
 
-```{r}
-location_gearST_redsnapper_summer<- location_gearST_redsnapper %>% dplyr::filter(month==6:11)
-head(location_gearST_redsnapper_summer)
+```{r warning=FALSE}
+location_gearST_redsnapper_sumfall<- location_gearST_redsnapper %>% dplyr::filter(month==6:11)
+head(location_gearST_redsnapper_sumfall)
 ```
 
 ##Select Summer Data
-```{r echo=TRUE, include=TRUE}
+```{r echo=TRUE, include=TRUE, warning=FALSE}
 location_gearST_redsnapper_summer<- location_gearST_redsnapper %>% dplyr::filter(month==c(6,7))
 head(location_gearST_redsnapper_summer)
 ```
+
+##Summer CPUE Over Time
+
+<iframe width="560" height="315" src="https://nceas.github.io/oss-fishteam/SeamapCPUEdeMutsert.mp4" frameborder="0" allowfullscreen></iframe>
+
