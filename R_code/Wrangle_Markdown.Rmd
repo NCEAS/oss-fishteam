@@ -1,0 +1,186 @@
+---
+title: "Data Wrangle"
+author: "Fish Team!"
+date: "7/26/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r import data and load packages, include=FALSE}
+setwd("~/oss/Synthesis/Seamap")
+invrec <-read.table("INVREC.txt", header=TRUE,sep=",")
+starec <-read.table("STAREC.txt", header=TRUE,sep=",")
+bgsrec <-read.table("BGSREC.txt", header=TRUE,sep=",")
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r clean and parse down tables, include=FALSE}
+toNumerics <- function(Date) {
+  stopifnot(inherits(Date, c("Date", "POSIXt")))
+  day <- as.numeric(strftime(Date, format = "%d"))
+  month <- as.numeric(strftime(Date, format = "%m"))
+  year <- as.numeric(strftime(Date, format = "%Y"))
+  list(year = year, month = month, day = day)
+}
+
+fishdata <- dplyr::select(bgsrec,STATIONID,GENUS_BGS,SPEC_BGS,CNTEXP)
+starec$Date <- as.POSIXct(starec$MO_DAY_YR,format='%m/%d/%Y')
+starec$Time <- sapply(strsplit(as.character(starec$MO_DAY_YR), " "), "[", 2)
+testdates<-data.frame(toNumerics(starec$Date))
+starec$year<-testdates$year
+starec$month<-testdates$month
+starec$day<-testdates$day
+location <- dplyr::select(starec,STATIONID,DECSLAT,DECSLON,HAULVALUE,year,month,day)
+gear <- dplyr::select(invrec,STATIONID, GEAR_SIZE, GEAR_TYPE, MESH_SIZE, MIN_FISH)
+rm(bgsrec,invrec,starec,testdates)
+```
+
+##Import Data
+
+####Fish Data
+```{r Display Fish data, echo=TRUE, include=TRUE}
+head(fishdata)
+```
+
+####Location Data
+```{r Display Location data, echo=TRUE, include=TRUE}
+head(location)
+```
+
+####Gear Data
+```{r Display Gear data, echo=TRUE, include=TRUE}
+head(gear)
+```
+
+##Select Gear Type
+
+```{r echo=FALSE, include=TRUE}
+setwd("~/oss/Synthesis/Seamap")
+INVREC<- read.table("INVREC.txt", sep=",", stringsAsFactors = FALSE, header = TRUE)
+GLFREC<- read.table("GLFREC.txt", sep=",", stringsAsFactors = FALSE, header = TRUE)
+
+INV<- INVREC %>% select(CRUISEID, STATIONID, INVRECID, GEAR_TYPE, GEAR_SIZE, MESH_SIZE) %>% filter(GEAR_TYPE=="ST") #Remove some columns and filter for Shrimp Trawl
+
+GLF<- GLFREC %>% select(CRUISEID, STATIONID, GLFID, SPEC_GLF, LEN_GLF, MEASCD_GLF) %>% filter(SPEC_GLF=="CAMPEC") #Remove some columns and filter for red snapper
+
+#Make Sure these are all true!
+length(unique(INV$STATIONID))==length(INV$STATIONID) #Station ID is unique after filtering in tows of INV
+length_freq<- left_join(select(GLF, CRUISEID, STATIONID, LEN_GLF, MEASCD_GLF), select(INV, STATIONID, GEAR_TYPE, GEAR_SIZE, MESH_SIZE), by="STATIONID")
+length(length_freq$STATIONID)==length(GLF$STATIONID) #New size matches GLF so not repating length values. Merge successful.
+
+#Check freqency of each gear type
+length_freq<- length_freq %>% mutate(GEAR_MERGE=paste(GEAR_TYPE,GEAR_SIZE,MESH_SIZE, sep="_"))
+gear_freq<-table(length_freq$GEAR_MERGE)
+gear_freq
+barplot(gear_freq, xlab = "Gear", ylab = "Frequecy", main="Gear Used to Catch Red Snapper")
+```
+
+```{r Select Gear Type, echo=TRUE, include=TRUE}
+gearshrimptrawl <- dplyr::filter(gear, GEAR_TYPE=="ST", GEAR_SIZE==40, MESH_SIZE==1.63) 
+head(gearshrimptrawl)
+```
+
+##Join Gear and Location
+
+###Gear
+```{r echo=TRUE, include=TRUE}
+head(gearshrimptrawl)
+```
+
+####Location
+```{r echo=TRUE, include=TRUE}
+head(location)
+```
+
+####Gear + Location
+```{r echo=TRUE, include=TRUE}
+location_gearST <- dplyr::inner_join(location,gearshrimptrawl,by="STATIONID")
+head(location_gearST)
+```
+
+##Join Fish Data
+
+####Gear + Location 
+```{r echo=TRUE, include=TRUE}
+location_gearST <- dplyr::inner_join(location,gearshrimptrawl,by="STATIONID")
+head(location_gearST)
+```
+
+####Gear + Location + Fish
+```{r echo=TRUE, include=TRUE}
+location_gearST_fish <- dplyr::left_join(location_gearST,fishdata,by="STATIONID")
+head(location_gearST_fish)
+```
+
+##Get sites where Red Snapper data was present
+
+####Filter Fish Data for Red Snapper
+```{r echo=TRUE, include=TRUE}
+redsnapper <- dplyr::filter(fishdata,GENUS_BGS=="LUTJANU",SPEC_BGS=="CAMPEC")
+head(redsnapper)
+```
+
+##Join Red Snapper
+
+####Gear + Location + Fish +Red Snapper
+```{r echo=TRUE, include=TRUE}
+location_gearST_redsnapper <- dplyr::left_join(location_gearST,redsnapper,by="STATIONID")
+head(location_gearST_redsnapper)
+```
+
+##Why didn't we filter for Red Snapper earlier in Fish Data?
+#### To detect true absence
+#####NA's represent areas where shrimp trawl was used but red snapper not caught
+```{r echo=TRUE, include=TRUE}
+head(location_gearST_redsnapper)
+```
+####How many absences?
+
+```{r echo=TRUE, include=TRUE}
+sum(is.na(location_gearST_redsnapper$SPEC_BGS))
+```
+
+####Add zeros and genus/species
+```{r echo=TRUE, include=TRUE}
+location_gearST_redsnapper$GENUS_BGS <-"LUTJANU"
+location_gearST_redsnapper$SPEC_BGS <-"CAMPEC"
+location_gearST_redsnapper[is.na(location_gearST_redsnapper$CNTEXP),"CNTEXP"] <-0
+head(location_gearST_redsnapper)
+```
+
+##Remove Bad Hauls
+```{r echo=TRUE, include=TRUE}
+location_gearST_redsnapper <- dplyr::filter(location_gearST_redsnapper,HAULVALUE!="B")
+summary(location_gearST_redsnapper$HAULVALUE)
+```
+
+##Check for and remove missing data
+```{r echo=TRUE, include=TRUE}
+colSums(is.na(location_gearST_redsnapper))
+location_gearST_redsnapper<- na.omit(location_gearST_redsnapper)
+```
+
+##Calculate Catch Per Unit Effort (CPUE)
+####CPUE=Count/Minutes Trawled
+```{r echo=TRUE, include=TRUE}
+location_gearST_redsnapper<- location_gearST_redsnapper %>% dplyr::mutate(CPUE=CNTEXP/MIN_FISH)
+head(location_gearST_redsnapper)
+```
+
+##Which months were the Red Snapper collected the most?
+
+```{r echo=TRUE, include=TRUE}
+counts<-table(location_gearST_redsnapper$month)
+barplot(counts, xlab="Month", ylab = "Sampling Effort", main="Red Snapper Sampling Effort vs Month")
+```
+####June-July and October-November
+
+##Select Summer Data
+```{r echo=TRUE, include=TRUE}
+location_gearST_redsnapper_summer<- location_gearST_redsnapper %>% dplyr::filter(month > 5, month < 8)
+head(location_gearST_redsnapper_summer)
+```
