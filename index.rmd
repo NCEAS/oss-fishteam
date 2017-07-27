@@ -1,0 +1,17 @@
+---
+title: "OSS Working Group: Red Snapper in the Gulf of Mexico"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](test_fish.JPG)
+
+<br></br>
+
+## Outline
+
+[Meta-analysis](https://nceas.github.io/oss-fishteam/Meta-analysis/Meta-analysis_frequency.html)
+
