@@ -23,4 +23,4 @@ knitr::opts_chunk$set(echo = TRUE)
 
 [Data Analysis](https://nceas.github.io/oss-fishteam/Presentation/Analyses_fish_and_environment.html)
 
-[Conclusions and Next Steps]()
+[Conclusions and Next Steps](https://nceas.github.io/oss-fishteam/Presentation/Conclusion_Slide.html)

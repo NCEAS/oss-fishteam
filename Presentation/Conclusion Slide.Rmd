@@ -19,3 +19,6 @@ knitr::opts_chunk$set(echo = TRUE)
 * Apply framework to other species
 
 ![Moses Splits the GOM](splitgulfinhalf.jpg)
+
+
+[The End](https://nceas.github.io/oss-fishteam/OSSwizards.pdf)
