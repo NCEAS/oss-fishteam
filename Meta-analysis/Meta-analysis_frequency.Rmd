@@ -4,10 +4,7 @@ author: "Group 3"
 output:
   html_document:
     theme: yeti
-    toc: yes
-    toc_depth: 1
-    toc_float: yes
-
+    toc: FALSE
 ---
    
 ```{r setup, include=FALSE}
