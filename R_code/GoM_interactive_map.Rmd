@@ -1,13 +1,10 @@
 ---
-title: "GoM_interactive_map"
-author: "Tang"
-date: "July 24, 2017"
+title: "GoM Interactive Map"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
 
 library(data.table)
 library(stringr)
