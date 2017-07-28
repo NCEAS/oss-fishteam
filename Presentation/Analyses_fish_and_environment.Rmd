@@ -11,20 +11,20 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Do environmental factors drive fish distribution?
 
-During the fish surveys where red snapper was collected, environmental variables were collected as well. Simultaneous collection of fish and environmental variable makes SEAMAP an excellent dataset to investigate which environmental variables are drivers of fish abundance and distribution. Based on the meta-analysis and available data, temperature, salinity, dissolved oxygen, and Chlorophyll a were chosen in the analyses. First a very similar data wrangling process as just presented for red snapper CPUE. 
+###During the fish surveys where red snapper was collected, environmental variables were collected as well. Simultaneous collection of fish and environmental variable makes SEAMAP an excellent dataset to investigate which environmental variables are drivers of fish abundance and distribution. Based on the meta-analysis and available data, temperature, salinity, dissolved oxygen, and Chlorophyll a were chosen in the analyses. First a very similar data wrangling process as just presented for red snapper CPUE. 
 
 ![simpsons](simpsons-yeoal.jpg)
 
 
 ##Are there significant correlations between fish abundance and environmental drivers?
 
-Next use GAMS (General Additive Models) to determine significance of environmental variables (drivers) to Red Snapper abundance and distribution, and determine what the predicted Red Snapper abundance and distribution would be based on the drivers.
+###Next use GAMS (General Additive Models) to determine significance of environmental variables (drivers) to Red Snapper abundance and distribution, and determine what the predicted Red Snapper abundance and distribution would be based on the drivers.
 
-We transformed the data in two ways:
-Normalized and log-transformed 
+###We transformed the data in two ways:
+###Normalized and log-transformed 
 
 
-We first run the GAM models, and then proceed with model selection. 34 distinct models were analyzed, ranging from Gaussian, Gamma, and Poisson distributions, and a range of predictor combinations from full-predictor models to single-predictor models. Most models included a time and space predictor.
+###We first run the GAM models, and then proceed with model selection. 34 distinct models were analyzed, ranging from Gaussian, Gamma, and Poisson distributions, and a range of predictor combinations from full-predictor models to single-predictor models. Most models included a time and space predictor.
 
 ```{r, eval=FALSE}
 
@@ -77,8 +77,10 @@ dev.off()
 
 ```
 
-
-![AIC tables](aicctablesall.png)
+##AIC tables
+<div style="width:500px; height=300px">
+![](aicctablesall.png)
+</div>
 
 Then we examined Q-Q plots of the GAM predicted outputs, residuals, and scatter plots of linear predictions vs. observations in batch. These allowed us to examine the predicted vs observed values that our top GAMs were providing, in order for us to make a more informed decision.
 
@@ -109,72 +111,93 @@ for (i in 1:34) {
 ... 
 
 ```
-
-![GAM Comparison](gamcompare.jpg)
+##GAM Comparison
+<div style="width:500px; height=300px">
+![](gamcompare.jpg)
+</div>
 
 
 #Top 3 Models per type
 ###GausLog
-gam1
-f.a.mgauslog
-full.additive.modelgauslog
+###-------
+###gam1
+###f.a.mgauslog
+###full.additive.modelgauslog
  
 ###GammaNorm
-linmod.mult.gamma
-gam2a
-full.additive.modelgamma
+###---------
+###linmod.mult.gamma
+###gam2a
+###full.additive.modelgamma
  
 ###GausNorm
-f.a.mgaus
-full.mult.modgaus
-full.additive.modelgaus
+###-------
+###f.a.mgaus
+###full.mult.modgaus
+###full.additive.modelgaus
 
 #################
 ##Best Model Chosen: f.a.mgaus
 #################
-![model relevance](BestGAMResults.jpg)
+##model relevance
+<div style="width:500px; height=300px">
+![](BestGAMResults.jpg)
+</div>
 
-Temperature and Salinity are 
-![Temp and Salinity GAM Obs vs. Pred](BestGAM_T_S_plot.pdf)
+##Temp and Salinity GAM Obs vs. Pred
+<div style="width:500px; height=300px">
+![](BestGAM_T_S_plot.png)
+</div>
 
-![Chl-a and Dissolved O2 GAM Obs vs. Pred](BestGAM_CHLA_OXY_plot.pdf)
+##Chl-a and Dissolved O2 GAM Obs vs. Pred
+<div style="width:500px; height=300px">
+![](BestGAM_CHLA_OXY_plot.jpg)
+</div>
 
-![Time GAM Obs vs. Pred](BestGAM_t_plot.jpg)
+##Time GAM Obs vs. Pred
+<div style="width:500px; height=300px">
+![](BestGAM_t_plot.jpg)
+</div>
 
 
 ##Observed versus predicted
 
-How do the predicted values of Red Snapper CPUE (based on environmental variables) compare to the observed Red Snapper CPUE values?
+###How do the predicted values of Red Snapper CPUE (based on environmental variables) compare to the observed Red Snapper CPUE values?
 
-We examined predictions of CPUE based on seamap environmental observations and NOAA cast data observations. When all environmental data were available, CPUE could be predicted as our model equation considered all seapamp environmental data:
+###We examined predictions of CPUE based on seamap environmental observations and NOAA cast data observations. When all environmental data were available, CPUE could be predicted as our model equation considered all seapamp environmental data:
 $$ CPUE_{pred} =  T_{mid} + S_{mid} + Chla_{surf} + dO_{bottom} + season + t + (Lat,Lon)$$
 
-We interpolated over dense point layers using Voronoi surfaces to compare both observed CPUE and predicted CPUE. Data were distributed along the NGOM for seamap data and along the NW GOM for NOAA cast data from available observations. 
+###We interpolated over dense point layers using Voronoi surfaces to compare both observed CPUE and predicted CPUE. Data were distributed along the NGOM for seamap data and along the NW GOM for NOAA cast data from available observations. 
 
 
-![Seamap CPUE Predictions](seamapfitCPUEpredictions.jpg)
+##Seamap CPUE Predictions
+![](seamapfitCPUEpredictions.jpeg)
 
-![NOAA CPUE Predictions](seamapfitCPUEpredictionsNOAA.jpg)
+##NOAA CPUE Predictions
+![](seamapfitCPUEpredictionsNOAA.jpeg)
 
-![Seamap Observations of CPUE Interpolation](seamapobsCPUE.jpg)
-
-
-![Seamap CPUE Predictions Interpolation](seamapCPUEPredictions.jpg)
-
-
-![Seamap Obs and Pred Difference](SeamapDifferenceObsSeamap.jpg)
+##Seamap Observations of CPUE Interpolation
+![](seamapobsCPUE.jpeg)
 
 
-Our Seamap CPUE predictions (on data based off of Seamap environmental data) were quite good, with variance being -0.11. However, this encompasses the entire study area and not only where CPUE measurements were calculated from observed data.
+##Seamap CPUE Predictions Interpolation
+![](seamapCPUEPredictions.jpeg)
 
-Our model shows that we can obtain relatively good estimates of CPUE based on the environmental variables:
 
-1. Temperature at mid-depth
-2. Salinity at mid-depth
-3. Chlorophyll-a at mid-depth
-4. Dissolved Oxygen at mid-depth
-5. seasonal variation
-6. Time
-7. Space
+##Seamap Obs and Pred Difference
+![](SeamapDifferenceObsSeamap.jpeg)
 
-Further studies will include more sophisticated modeling efforts and geospatial and satellite data to supplement Seamap and NOAA observations.
+
+###Our Seamap CPUE predictions (on data based off of Seamap environmental data) were quite good, with variance being -0.11. However, this encompasses the entire study area and not only where CPUE measurements were calculated from observed data.
+
+###Our model shows that we can obtain relatively good estimates of CPUE based on the environmental variables:
+
+###1. Temperature at mid-depth
+###2. Salinity at mid-depth
+###3. Chlorophyll-a at mid-depth
+###4. Dissolved Oxygen at mid-depth
+###5. seasonal variation
+###6. Time
+###7. Space
+
+###Further studies will include more sophisticated modeling efforts and geospatial and satellite data to supplement Seamap and NOAA observations.
