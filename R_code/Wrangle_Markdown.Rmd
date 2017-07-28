@@ -21,6 +21,7 @@ The Southeast Area Monitoring and Assessment Program (SEAMAP) is a fisheries-ind
 <br></br>
 ##Import Data
 ```{r import data and load packages, echo=TRUE, include=TRUE, cache=TRUE}
+
 setwd("~/oss/Synthesis/Seamap")
 invrec <-read.table("INVREC.txt", header=TRUE,sep=",")
 starec <-read.table("STAREC.txt", header=TRUE,sep=",")
@@ -34,6 +35,7 @@ head(glfrec)
 ```
 
 ```{r clean and parse down tables, include=FALSE, cache=TRUE}
+
 toNumerics <- function(Date) {
   stopifnot(inherits(Date, c("Date", "POSIXt")))
   day <- as.numeric(strftime(Date, format = "%d"))
