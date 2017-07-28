@@ -19,7 +19,7 @@ output:
 
 ## 
 
-<img src="Slide6.png" alt="Drawing" style="width: 600px;"/>
+<img src="Slide6.png" alt="Drawing" style="height: 500px;"/>
 
 [Home](https://nceas.github.io/oss-fishteam/)
 
