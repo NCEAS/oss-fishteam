@@ -8,7 +8,6 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-
 library(data.table)
 library(stringr)
 library(dplyr)
@@ -26,24 +25,32 @@ library(RColorBrewer)
 
 ```
 ![](ctd.jpg)
+
 # Raw data file example
+
 The data was downloaded from https://www.nodc.noaa.gov/OC5/WOD/pr_wod.html using  the WOD select tool to grab data (latitude 18.5 - 32.5, longitude -97.8 - -80.0) using all defaults (selecting all variables from all data sources/years for the entire GOM). Data were downloaded in standard .csv format. We chose observed level data, and applied the most recently published XBT correction (Cheng et al. 2014).
+
 ```{r echo=FALSE}
 rawdata<-readLines("ocldb1499972358.22646.CTD.csv",n=25)
 rawdata[1:5]
 rawdata[19:25]
 ```
+
 And, we have four huge tables, each containing more than 20,000 tables.
 
 ![](paper-pile.png)
 
 # Step 1, extract date and location information
+
 We want to create a table in the following format:
+
 ```{r echo = FALSE}
 sampledata<-read.table(file="CRUISES.txt",nrows=3, sep = ",",header = TRUE)
 datatable(sampledata)
 ```
+
 To do that, based on the structure of available data, we first extract the location, date and cast data using `str_match`. We want `cast`, because this is the unique ID we can use later to join the environmental data.
+
 ```{r eval=FALSE, echo=FALSE}
 # Select the all the cast, latitudes, longtitude and date data from the csv file
 lat<-str_match(data.ctd,"(Latitude)\\s+,,\\s*(\\S\\d+.\\d*)")
@@ -76,14 +83,17 @@ latdir<-getwd()
  write_csv(loc.date.ctd,file.path(dir,"loc_date_ctd.csv"))
 
 ```
+
 Using this process we obtain data in the following format
+
 ```{r echo = FALSE}
-head(read.csv(file="loc_date_osd.csv",nrows=10))
+datatable(read.csv(file="loc_date_osd.csv",nrows=10))
 ```
 
 ![](hivebench.png)
 
 # Step 2, extract all tables with environmental data
+
 Insepecting the raw data tables, we found that the rows we need always started with `VARIABLES` and ended with `END OF VARIABLE SECTION`. Thus, we use these two strings and `str_detect` to find the beginning and ending row index for each table we want to read. Then we either used loops or tapply to extract all tables. Finally, we also assigned the cast ID for each table.
 
 We extracted tables from CTD, XBT, and PFL casts using parallel processing.
@@ -281,11 +291,14 @@ for (i in Seq){
 write.csv(measure, "env_measures_xbt.csv") #saves variable table_list to file
 
 ```
+
 We obtained one table for each cast with all oceanographic measurements and cast IDs:
+
 ```{r echo=FALSE}
-head(read.csv(file="NOAA_env_data_CTD_XBT_PFL.csv",nrows=10))
+datatable(read.csv(file="NOAA_env_data_CTD_XBT_PFL.csv",nrows=10))
 
 ```
+
 Then, we combined the four tables into one big table with all oceanographic measurements from all different methods.
 
 ```{r eval= FALSE, echo=FALSE}
@@ -405,19 +418,22 @@ write.csv(testunique,"loc_date_depth_all.csv")
 ```
 Then, we can obtain a table with all cast ID and bottom ocean depth.
 ```{r echo=FALSE}
-head(read.csv(file="loc_date_depth_all.csv",nrows=10))
+datatable(read.csv(file="loc_date_depth_all.csv",nrows=10))
 
 ```
 
 # Step 4, merge data from step 2 with data from step 3
+
 Now, we combine the location, time and bottom depth data with the environment table by cast ID using `merge` with `all = TURE`. Finally, we arrived at one big table with all information
+
 ```{r echo = FALSE}
-datatable(read.csv(file="env_summer.csv",nrows=10))
+read.csv(file="env_summer.csv",nrows=10)[,1:12]
 
 ```
 ![](data-collection-transformation-factory-machines-turning-doc-collecting-transforming-unorganized-paper-processed-60909572.jpg)
 
-# Step 5, data manipulation.
+# Step 5, data manipulation
+
 We needed to assign each cast id one unique row of oceanographic data, including water column averaged temperature and salinity, surface chlorophyl, and bottom water DO.
 
 ```{r echo = FALSE, eval=FALSE}
@@ -498,19 +514,23 @@ head(predict.data)
 write.csv(predict.data,"predict_data.csv")
 
 ```
+
 The final data table looked like this:
+
 ```{r echo = FALSE}
 
 final.data=read.csv(file="predict_data.csv",nrows=10)
-head(final.data)
+datatable(final.data)
 
 ```
+
 And contained `r nrow(final.data)` casts.
 
 ![](googlerefine-9251.jpg)
 
 ## Step 6, create interactive map
-Now, we create an interactive map with layers : oil spill incidents, temprature, salinity, DO, and Chol for future prediction of hot spot.
+
+Now, we create an interactive map with layers : oil spill incidents, temprature, salinity, DO, and Chol for future prediction of hot spots.
 
 
 ```{r echo = FALSE}
@@ -603,5 +623,6 @@ GoM
 
   
 ```
+
 https://tttang0602.shinyapps.io/IDW_app/
 

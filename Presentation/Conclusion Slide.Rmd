@@ -1,0 +1,21 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Conclusions and Future Directions
+
+* Temperature, Salinity, Chlorophyll a, Dissolved Oxygen, and Location all were significant drivers
+* Predictions matched observed CPUE well
+* Add more drivers to model to explain more variation
+    + Fishing Effort
+    + Bathymetry
+    + Oil spills
+    + Split Gulf in half
+* Expand to adults by using hook and line
+* Apply framework to other species
+
+![Moses Splits the GOM](splitgulfinhalf.jpg)

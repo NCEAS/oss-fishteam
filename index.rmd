@@ -8,13 +8,19 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 <br></br>
-![](test_fish.JPG)
+![](Presentation/test_fish.JPG)
 
 <br></br>
 
 ### Outline
-[Introduction](https://nceas.github.io/oss-fishteam/Presentation/Introduction_slides.html)
+[Introduction](https://nceas.github.io/oss-fishteam/Presentation/Intro_slides.html)
 
 [Meta-analysis](https://nceas.github.io/oss-fishteam/Meta-analysis/Meta-analysis_frequency.html)
 
 [Data Wrangling](https://nceas.github.io/oss-fishteam/R_code/Wrangle_Markdown.html)
+
+[NOAA Data Munging](https://nceas.github.io/oss-fishteam/Presentation/GoM_interactive_map.html)
+
+[Data Analysis](https://nceas.github.io/oss-fishteam/Presentation/Analyses_fish_and_environment.html)
+
+[Conclusions and Next Steps]()

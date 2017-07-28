@@ -4,12 +4,9 @@ author: "Group 3"
 output:
   html_document:
     theme: yeti
-    toc: yes
-    toc_depth: 3
-    toc_float: yes
-  pdf_document: default
+    toc: FALSE
 ---
-
+   
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -132,3 +129,5 @@ forest(m,leftcols = "Driver",rightcols = c("effect", "ci"), fontsize=12) #grid-b
 ```
 
 ![](./Final_heat_map.png) 
+
+[Next Topic](https://nceas.github.io/oss-fishteam/R_code/Wrangle_Markdown.html)
