@@ -21,4 +21,4 @@ knitr::opts_chunk$set(echo = TRUE)
 ![Moses Splits the GOM](splitgulfinhalf.jpg)
 
 
-[The End](https://nceas.github.io/oss-fishteam/OSSwizards.pdf)
+[The End](https://nceas.github.io/oss-fishteam/funslide.jpg)
