@@ -11,12 +11,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Do environmental factors drive fish distribution?
 
-During the fish surveys where red snapper was collected, environmental variables were collected as well. Simultaneous collection of fish and environmental variable makes SEAMAP an excellent dataset to investigate which environmental variables are drivers of fish abundance and distribution. Based on the meta-analysis and available data, temperature, salinity, dissolved oxygen, and Chlorophyll a were chosen in the analyses. First: a very similar data wrangling process as just presented for red snapper CPUE. 
+During the fish surveys where red snapper was collected, environmental variables were collected as well. Simultaneous collection of fish and environmental variable makes SEAMAP an excellent dataset to investigate which environmental variables are drivers of fish abundance and distribution. Based on the meta-analysis and available data, temperature, salinity, dissolved oxygen, and Chlorophyll a were chosen in the analyses. First a very similar data wrangling process as just presented for red snapper CPUE. 
 
 ![simpsons](simpsons-yeoal.jpg)
 
-Second: Are there significant correlations between fish abundance and environmental drivers?
-```{r correlation}
+Are there significant correlations between fish abundance and environmental drivers?
+```{r correlation, results="hide", warning=FALSE, message=FALSE}
 library(mgcv)
 #install.packages("gridExtra")
 library(base)
@@ -62,6 +62,20 @@ dataonlycorr<-dplyr::select(dataonly,-X,-year.x,-month.x,-day.x)
 
 corrfishvars<-cor(dataonlycorr,y=NULL,use="pairwise.complete.obs",method=c("pearson","kendall","spearman"))
 ```
+
+![output correlation](Correlation_data_output.pdf)
+
+next use GAMS (General Additive Models) to determine significance of environmental variables (drivers) to Red Snapper abundance and distribution, and determine what the predicted Red Snapper abundance and distribution would be based on the drivers.
+
+```{r}
+#insert code to create GAMM output figures here, and picture of significance table
+```
+
+##Observed versus predicted
+
+How do the predicted values of Red Snapper CPUE (based on environmental variables) compare to the observed Red Snapper CPUE values?
+
+(include map as image of observed versus predicted)
 
 
 
