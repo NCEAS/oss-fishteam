@@ -235,15 +235,15 @@ head(location_gearST_redsnapper_summer)
 ##SEAMAP Effort
 
 The total sampling effort between 1882 and 2017 was 11,000 hours.
-![](../EffortbyYear.png)
+![](../Presentation/EffortbyYear.png)
 <br></br>
 
-![](../SeamapEffort.png)
+![](../Presentation/SeamapEffort.png)
 
 
 ##Summer CPUE Over Time
 
-<iframe width="560" height="315" src="https://nceas.github.io/oss-fishteam/SeamapCPUEdeMutsert.mp4" frameborder="0" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://nceas.github.io/oss-fishteam/Presentation/SeamapCPUEdeMutsert.mp4" frameborder="0" allowfullscreen></iframe>
 
 
 [Data Wrangling](https://nceas.github.io/oss-fishteam/R_code/Wrangle_Markdown.html)
