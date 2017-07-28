@@ -1,21 +1,25 @@
 ---
+title: "Introduction"
 output:
   ioslides_presentation: default
   slidy_presentation: default
 ---
-##
 
-![](Slide2.png)
-
-
-
-##
-![](Slide3.png)
+##![](Slide2.png)
 
 
 
-##
-![](Slide4.png)
+## ![](Slide3.png)
 
-##
-![](Slide5.png)
+
+
+## ![](Slide4.png)
+
+## ![](Slide5.png)
+
+## 
+
+<img src="Slide6.png" alt="Drawing" style="width: 700px;"/>
+
+[Home](https://nceas.github.io/oss-fishteam/)
+

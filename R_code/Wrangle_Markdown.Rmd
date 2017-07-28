@@ -13,7 +13,12 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(ggplot2)
 ```
+<br></br>
+## Background
 
+The Southeast Area Monitoring and Assessment Program (SEAMAP) is a fisheries-independent data collection program that in the Gulf of Mexico was initiated in 1981 and includes the continental shelf of the U.S. waters. Sampling off Florida started later (2009). Our study examines data from the Groundfish Bottom Trawl surveys.
+
+<br></br>
 ##Import Data
 ```{r import data and load packages, echo=TRUE, include=TRUE, cache=TRUE}
 setwd("~/oss/Synthesis/Seamap")
@@ -227,7 +232,20 @@ location_gearST_redsnapper_summer<- location_gearST_redsnapper %>% dplyr::filter
 head(location_gearST_redsnapper_summer)
 ```
 
+##SEAMAP Effort
+
+The total sampling effort between 1882 and 2017 was 11,000 hours.
+![](../EffortbyYear.png)
+<br></br>
+
+![](../SeamapEffort.png)
+
+
 ##Summer CPUE Over Time
 
 <iframe width="560" height="315" src="https://nceas.github.io/oss-fishteam/SeamapCPUEdeMutsert.mp4" frameborder="0" allowfullscreen></iframe>
+
+
+[Data Wrangling](https://nceas.github.io/oss-fishteam/R_code/Wrangle_Markdown.html)
+
 
