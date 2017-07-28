@@ -20,3 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 [Data Wrangling](https://nceas.github.io/oss-fishteam/R_code/Wrangle_Markdown.html)
 
 [NOAA Data Munging](https://nceas.github.io/oss-fishteam/Presentation/GoM_interactive_map.html)
+
+[Data Analysis](https://nceas.github.io/oss-fishteam/Presentation/Analyses_fish_and_environment.html)
+
+[Conclusions and Next Steps]()
