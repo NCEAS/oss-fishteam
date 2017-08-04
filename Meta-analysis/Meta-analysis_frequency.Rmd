@@ -12,7 +12,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r library setup, include=FALSE,results="hide"}
-library(tidyverse)
 library(plotrix) #for quick s.e. calculations sometimes needed for data tidy step
 library(meta) #nice package for most meta-statistics
 library(DT)
@@ -23,8 +22,35 @@ library(knitr)
 ```
 <br><br>
 
-#### We used Web of Science to conduct a literature search:
+#### Load lit search CSVs.
+```{r Import Data}
+WebOfSci1 <- read_csv("csvs/WebOfSci_GulfOfMexico_RedSnapper_Distribution.csv")
+WebOfSci2 <- read_csv("csvs/WebOfSci_GulfOfMexico_RedSnapper_Dynamic.csv")
+WebOfSci3 <- read_csv("csvs/WebOfSci_GulfOfMexico_RedSnapper_Habitat.csv")
+Proquest1 <- read_csv("csvs/Proquest_GulfOfMexico_RedSnapper_Distribution.csv")
+Proquest2 <- read_csv("csvs/Proquest_GulfOfMexico_RedSnapper_Dynamic.csv")
+Proquest3 <- read_csv("csvs/Proquest_GulfOfMexico_RedSnapper_Habitat.csv")
+GoogleScholar1 <-read_ris("csvs/GS_GulfOfMexico_RedSnapper_Distribution.RIS",50)
+GoogleScholar2 <-read_ris("csvs/GS_GulfOfMexico_RedSnapper_Dynamic.RIS",50)
+GoogleScholar3 <-read_ris("csvs/GS_GulfOfMexico_RedSnapper_Habitat.RIS",50)
+
+# put all titles into one list
+titleList <- rbind(WebOfSci1,WebOfSci2,WebOfSci3,Proquest1,Proquest2,Proquest3,
+                   GoogleScholar1,GoogleScholar2,GoogleScholar3)
+
+# make titles all lowercase for matching
+titleListLower <- as.data.frame(str_to_lower(titleList$Title, locale = "en"))
+colnames(titleListLower) <-c("Title")
+
+# get subset of unique titles
+uniqueTitles <- unique(titleListLower)
+write.csv(uniqueTitles, file = "csvs/CombinedTitles.csv")
+
+```
+
+
 ```{r Search Terms, warning=FALSE, message=FALSE}
+
 searchTerms <- read_csv("search_terms.csv")
 kable(searchTerms, align = 'cll')
 
