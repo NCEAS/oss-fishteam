@@ -18,39 +18,71 @@ library(DT)
 library(tidyverse)
 library(PRISMAstatement)
 library(knitr)
+source('Meta-analysis/read_ris.R')
 
 ```
 <br><br>
 
 #### Load lit search CSVs.
-```{r Import Data}
+```{r Import Data, message=FALSE}
 WebOfSci1 <- read_csv("csvs/WebOfSci_GulfOfMexico_RedSnapper_Distribution.csv")
+WebOfSci1$source <-'wb1' # add a ref code so you know where these titles came from
 WebOfSci2 <- read_csv("csvs/WebOfSci_GulfOfMexico_RedSnapper_Dynamic.csv")
+WebOfSci2$source <-'wb2'
 WebOfSci3 <- read_csv("csvs/WebOfSci_GulfOfMexico_RedSnapper_Habitat.csv")
-Proquest1 <- read_csv("csvs/Proquest_GulfOfMexico_RedSnapper_Distribution.csv")
-Proquest2 <- read_csv("csvs/Proquest_GulfOfMexico_RedSnapper_Dynamic.csv")
-Proquest3 <- read_csv("csvs/Proquest_GulfOfMexico_RedSnapper_Habitat.csv")
+WebOfSci3$source <-'wb3'
+
+Ebsco1 <- read_csv("csvs/Ebsco_GulfOfMexico_RedSnapper_Distribution.csv")
+Ebsco1$source <-'eb1'
+Ebsco2 <- read_csv("csvs/Ebsco_GulfOfMexico_RedSnapper_Dynamic.csv")
+Ebsco2$source <-'eb2'
+Ebsco3 <- read_csv("csvs/Ebsco_GulfOfMexico_RedSnapper_Habitat.csv")
+Ebsco3$source <-'eb3'
+
 GoogleScholar1 <-read_ris("csvs/GS_GulfOfMexico_RedSnapper_Distribution.RIS",50)
+GoogleScholar1$source <-'gs1'
 GoogleScholar2 <-read_ris("csvs/GS_GulfOfMexico_RedSnapper_Dynamic.RIS",50)
+GoogleScholar2$source <-'gs2'
 GoogleScholar3 <-read_ris("csvs/GS_GulfOfMexico_RedSnapper_Habitat.RIS",50)
+GoogleScholar3$source <-'gs3'
 
 # put all titles into one list
-titleList <- rbind(WebOfSci1,WebOfSci2,WebOfSci3,Proquest1,Proquest2,Proquest3,
-                   GoogleScholar1,GoogleScholar2,GoogleScholar3)
+titleList <- rbind(WebOfSci1[c('Title','Authors','source')],
+                   WebOfSci2[c('Title','Authors','source')],
+                   WebOfSci3[c('Title','Authors','source')],
+                   Ebsco1[c('Title','Authors','source')],
+                   Ebsco2[c('Title','Authors','source')],
+                   Ebsco3[c('Title','Authors','source')],
+                   GoogleScholar1[c('Title','Authors','source')],
+                   GoogleScholar2[c('Title','Authors','source')],
+                   GoogleScholar3[c('Title','Authors','source')])
+```
 
+```{r wrangle for title matching}
 # make titles all lowercase for matching
-titleListLower <- as.data.frame(str_to_lower(titleList$Title, locale = "en"))
-colnames(titleListLower) <-c("Title")
+titleList$Title_lowercase <- str_to_lower(titleList$Title, locale = 'en')
+
+# comon case of mismatch is 'u.s.' vs. 'us', so convert all 'u.s.' into 'us' for matching
+titleList$Title_lowercase <-gsub('u\\.s\\.','us',titleList$Title_lowercase) 
+# Remove trailing periods
+titleList$Title_lowercase <-gsub('\\.$','',titleList$Title_lowercase) 
+# Remove anything with NA author:
+titleList <- titleList[!is.na(titleList$Authors),]
 
 # get subset of unique titles
-uniqueTitles <- unique(titleListLower)
-write.csv(uniqueTitles, file = "csvs/CombinedTitles.csv")
+uniqueTitles <- titleList[!duplicated(titleList$Title_lowercase),]
+write.csv(uniqueTitles, file = 'csvs/CombinedTitles.csv')
+
+cat(paste0(length(titleList$Title), ' papers found, ', length(uniqueTitles$Title), ' unique titles.'))
+```
+
+```{r}
+# To Do: Flag irrelevent titles based on a list of previously assessed titles.
+
 
 ```
 
-
 ```{r Search Terms, warning=FALSE, message=FALSE}
-
 searchTerms <- read_csv("search_terms.csv")
 kable(searchTerms, align = 'cll')
 

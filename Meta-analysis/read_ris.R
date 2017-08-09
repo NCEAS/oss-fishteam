@@ -11,20 +11,20 @@ read_ris <- function(filepath,nRows){
   while ( TRUE ) {
     line = readLines(con, n = 1)
     if ( length(line) == 0 ) {
-      print("end of file")
+      # print("end of file")
       break
     }
     if (!is.na(str_match(line, '^%T'))){
-      print(paste("title #", myIdx))
+      # print(paste("title #", myIdx))
       title <- str_extract(line, '(?<=%T ).*')
-      print(title)
+      # print(title)
       
     } 
     if (!is.na(str_match(line, '^%A'))){
       author<- str_extract(line, '(?<=%A ).*')
       if (is.null(authorList)){
         authorList <- author
-        print(authorList)
+        # print(authorList)
       }else{
         authorList <- paste0(authorList, ',', author)
       }
